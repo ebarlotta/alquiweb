@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('ivas', function (Blueprint $table) {
             $table->id();
+            $table->string('ivadescripcion');
             $table->timestamps();
         });
     }

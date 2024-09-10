@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('alqui_bien_inmuebles', function (Blueprint $table) {
             $table->id();
             $table->string('nomenclatura');
-            $table->string('canthabitaciones');
+            $table->integer('canthabitaciones');
             $table->timestamps();
         });
     }

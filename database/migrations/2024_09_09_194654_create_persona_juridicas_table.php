@@ -16,16 +16,14 @@ return new class extends Migration
             $table->string('razonsocial');
             $table->string('cuit');
             $table->string('observaciones');
-            $table->string('activo');
-            $table->unsignedBigInteger('email_id');
-            $table->unsignedBigInteger('telefono_id');
+            $table->boolean('activo');
+            $table->string('email');
+            $table->string('telefono');
             $table->unsignedBigInteger('iva_id');
             $table->unsignedBigInteger('domicilio_id');
 
             $table->timestamps();
 
-            $table->foreign('email_id')->references('id')->on('emails');
-            $table->foreign('telefono_id')->references('id')->on('telefonos');
             $table->foreign('iva_id')->references('id')->on('ivas');
             $table->foreign('domicilio_id')->references('id')->on('domicilios');
 

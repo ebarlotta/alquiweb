@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('depto');
             $table->string('ubicaciongps');
             $table->string('observaciones');
-            $table->string('activo');
+            $table->boolean('activo');
             $table->unsignedBigInteger('provincia_id');
             $table->unsignedBigInteger('localidad_id');
             $table->timestamps();
