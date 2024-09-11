@@ -15,7 +15,7 @@ use Livewire\WithPagination;
 class InquilinoComponent extends Component
 {
     //alqui_inquilino
-    public $persona_type='fisica', $persona_id, $search;
+    public $persona_type, $persona_id, $search;
 
     public $ivas, $provincias, $localidades, $provincia_id, $localidad_id;
     protected $inquilinos_fisica;
@@ -30,6 +30,10 @@ class InquilinoComponent extends Component
     use WithPagination;
 
     public function render() {
+
+        if(is_null($this->persona_type)) { $this->persona_type='fisica'; }
+        // dd($this->persona_type);
+        
         $this->ivas = iva::all();
         $this->provincias = provincias::all();
         $this->localidades = localidades::all();
@@ -93,8 +97,8 @@ class InquilinoComponent extends Component
     }
 
     public function CambiarPersona($persona) {
-        if($persona=='fisica') $this->persona_type='juridica';
-        if($persona=='juridica') $this->persona_type='fisica';
+        if($persona=='fisica') $this->persona_type='fisica';
+        if($persona=='juridica') $this->persona_type='juridica';
     }
 
     public function store() {

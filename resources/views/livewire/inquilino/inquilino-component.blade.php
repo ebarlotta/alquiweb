@@ -56,7 +56,10 @@
                 <td><input class="btn btn-warning" value="Modificar" wire:click="edit({{ $inquilino->persona_id }},'juridica')" data-toggle="modal" data-target="#ModalNuevaInquilino"></td>
             </tr>
         @endforeach
+
     </table>
+
+Persona: {{ $persona_type }}
 
     {{-- <div class="card card-primary card-tabs">
         <div class="card-header p-0 pt-1">
@@ -266,10 +269,13 @@
                                 <div class="input-group-prepend">
                                     <button type="button" class="btn btn-info">Tipo Pers.</button>
                                 </div>
-                                <select class="form-control col-12" wire:model="persona_type" wire:change="CambiarPersona('{{ $persona_type }}')">
+                                <div><input type="radio" name="persona" value="física" wire:click="CambiarPersona('fisica')"><label>Física</label></div>
+                                <div><input type="radio" name="persona" value="jurídica" wire:click="CambiarPersona('juridica')"><label>Jurídica</label></div>
+
+                                {{-- <select class="form-control col-12" wire:model="persona_type" wire:click="CambiarPersona({{ $persona_type }})" >
                                     <option value="fisica">Persona física</option>
                                     <option value="juridica">Persona jurídica</option>
-                                </select>
+                                </select> --}}
                             </div>
                             @if($persona_type=='fisica')
                                 <div class="input-group mb-3 col-6">
@@ -386,24 +392,21 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div @if($persona_type=='fisica') class="input-group mb-3 col-6" @else class="input-group mb-3 col-12" @endif>
+                            <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
                                     <button type="button" class="btn btn-info">Observaciones</button>
                                 </div>
                                 <input type="text" class="form-control" wire:model="observaciones">
                             </div>
+                            <div class="input-group mb-3 col-6">
+                                <div class="input-group mx-auto">
+                                    <input type="button" class="form-control btn-success mx-3 col-12" value="Guardar" wire:click="store()">
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 
-
-
-
-
-
-
-
-
-
 
                     <div class="pt-3">
                         <button type="button" class="btn btn-success" data-dismiss="modal" wire:click="store()">
