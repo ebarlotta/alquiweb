@@ -14,7 +14,7 @@
 
     <div class="d-flex">
         <h2 class="col-2"> Inquilinos </h2>
-        <input class="ml-3 btn btn-info col-1" type="button" value="Nuevo" data-toggle="modal" data-target="#ModalNuevaInquilino">
+        <input class="ml-3 btn btn-info col-1" type="button" value="Nuevo" wire:click="Nuevo()" data-toggle="modal" data-target="#ModalNuevaInquilino">
         <input class="ml-3 w-full col-9 pr-5" type="text" placeholder="Buscar" wire:model="search" wire:keyup="Buscar()">
     </div>
 

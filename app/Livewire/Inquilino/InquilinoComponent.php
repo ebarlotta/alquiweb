@@ -34,7 +34,7 @@ class InquilinoComponent extends Component
         $this->provincias = provincias::all();
         $this->localidades = localidades::all();
 
-        $this->inquilinos = persona_fisica::all();
+        // $this->inquilinos = persona_fisica::all();
 
         $this->Buscar();
 
@@ -42,26 +42,55 @@ class InquilinoComponent extends Component
         return view('livewire.inquilino.inquilino-component',['inquilinos_fisica'=>$this->inquilinos_fisica,'inquilinos_juridica'=>$this->inquilinos_juridica])->extends('adminlte::page');
     }
 
-public function Buscar() {
-    $this->inquilinos_fisica = alqui_inquilino::join('persona_fisicas','alqui_inquilinos.persona_id','persona_fisicas.id')
-    ->join('domicilios','persona_fisicas.domicilio_id','domicilios.id')
-    ->join('ivas','persona_fisicas.iva_id','ivas.id')
-    ->join('provincias','domicilios.provincia_id','provincias.id')
-    ->join('localidads','domicilios.localidad_id','localidads.id')
-    ->where('persona_fisicas.nombres','like',  '%' . $this->search . '%')
-    ->paginate(5);
-    // ->get();
-    
-    $this->inquilinos_juridica = alqui_inquilino::join('persona_juridicas','alqui_inquilinos.persona_id','persona_juridicas.id')
-    ->join('domicilios','persona_juridicas.domicilio_id','domicilios.id')
-    ->join('ivas','persona_juridicas.iva_id','ivas.id')
-    ->join('provincias','domicilios.provincia_id','provincias.id')
-    ->join('localidads','domicilios.localidad_id','localidads.id')
-    ->where('persona_juridicas.razonsocial','like',  '%' . $this->search . '%')
-    ->paginate(5);
-    // ->get();
+    public function Nuevo() {
+        // $this->reset([]);
+        $this->persona_id='';
+        $this->search='';
+        $this->ivas='';
+        $this->provincias='';
+        $this->localidades='';
+        $this->provincia_id='';
+        $this->localidad_id='';
+        $this->inquilinos_fisica='';
+        $this->inquilinos_juridica='';
+        $this->calle='';
+        $this->apellidos='';
+        $this->nombres='';
+        $this->cuil='';
+        $this->dni='';
+        $this->telefono='';
+        $this->whatsapp='';
+        $this->email_id='';
+        $this->iva_id='';
+        $this->fechanacimiento='';
+        $this->fechainicioact='';
+        $this->domicilio_id='';
+        $this->observaciones='';
+        $this->activo='';
+        $this->razonsocial='';
+        $this->cuit='';
+    }
 
-}
+    public function Buscar() {
+        $this->inquilinos_fisica = alqui_inquilino::join('persona_fisicas','alqui_inquilinos.persona_id','persona_fisicas.id')
+        ->join('domicilios','persona_fisicas.domicilio_id','domicilios.id')
+        ->join('ivas','persona_fisicas.iva_id','ivas.id')
+        ->join('provincias','domicilios.provincia_id','provincias.id')
+        ->join('localidads','domicilios.localidad_id','localidads.id')
+        ->where('persona_fisicas.nombres','like',  '%' . $this->search . '%')
+        ->paginate(5);
+        // ->get();
+        
+        $this->inquilinos_juridica = alqui_inquilino::join('persona_juridicas','alqui_inquilinos.persona_id','persona_juridicas.id')
+        ->join('domicilios','persona_juridicas.domicilio_id','domicilios.id')
+        ->join('ivas','persona_juridicas.iva_id','ivas.id')
+        ->join('provincias','domicilios.provincia_id','provincias.id')
+        ->join('localidads','domicilios.localidad_id','localidads.id')
+        ->where('persona_juridicas.razonsocial','like',  '%' . $this->search . '%')
+        ->paginate(5);
+        // ->get();
+
+    }
 
     public function CambiarPersona($persona) {
         if($persona=='fisica') $this->persona_type='juridica';
