@@ -12,11 +12,13 @@ class persona_juridica extends Model
     protected $fillable=[
         'razonsocial',
         'cuit',
-        'telefono_id',
-        'emails_id',
+        'telefono',
+        'whatsapp',
+        'email_id',
+        'iva_id',
+        'fechainicioact',
+        'domicilio_id',
         'observaciones',
         'activo',
-        'iva_id',
-        'domicilio_id',
     ];
 }

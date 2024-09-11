@@ -4,6 +4,7 @@ use App\Livewire\Actualizacion\ActualizacionComponent;
 use App\Livewire\Ajuste\AjusteComponent;
 use App\Livewire\Bienes\BienesComponent;
 use App\Livewire\Contrato\ContratoComponent;
+use App\Livewire\Moneda\MonedaComponent;
 use App\Livewire\Inquilino\InquilinoComponent;
 use App\Livewire\Propietario\PropietarioComponent;
 use App\Livewire\Tipopropiedades\TipopropiedadesComponent;
@@ -32,3 +33,4 @@ Route::get('/tipospropiedades', TipopropiedadesComponent::class)->name('tipospro
 Route::get('/tipospropietarios', TipopropietarioComponent::class)->name('tipospropietarios');
 Route::get('/actualizaciones', ActualizacionComponent::class)->name('actualizaciones');
 Route::get('/ajustes', AjusteComponent::class)->name('ajustes');
+Route::get('/monedas', MonedaComponent::class)->name('monedas');

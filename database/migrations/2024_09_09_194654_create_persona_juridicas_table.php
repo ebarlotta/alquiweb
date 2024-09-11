@@ -16,11 +16,13 @@ return new class extends Migration
             $table->string('razonsocial');
             $table->string('cuit');
             $table->string('observaciones');
-            $table->boolean('activo');
-            $table->string('email');
+            $table->string('email_id');
             $table->string('telefono');
+            $table->string('whatsapp');
             $table->unsignedBigInteger('iva_id');
+            $table->date('fechainicioact');
             $table->unsignedBigInteger('domicilio_id');
+            $table->boolean('activo');
 
             $table->timestamps();
 

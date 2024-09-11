@@ -407,6 +407,10 @@ return [
                     'text' => 'Ajustes',
                     'url' => 'ajustes',
                 ],
+                [
+                    'text' => 'Monedas',
+                    'url' => 'monedas',
+                ],
             ],
         ],
     ],

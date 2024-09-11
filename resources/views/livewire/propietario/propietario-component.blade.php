@@ -24,8 +24,20 @@
                                 </div>
                                 <input type="text" class="form-control">
                             </div>
+                            <div class="input-group mx-auto">
+                                <input type="button" class="form-control btn-success mx-3 col-12" value="Guardar">
+                            </div>
                         </div>
                         <div class="col-9 d-flex flex-wrap m-2 p-2 rounded-md" style="background-color: lightgray;border-radius: 5px;">
+                            <div class="input-group mb-3 col-6">
+                                <div class="input-group-prepend">
+                                    <button type="button" class="btn btn-info" wire:model="apellido">Apellidos</button>
+                                </div>
+                                <select class="form-control col-12">
+                                    <option value=0>Persona física</option>
+                                    <option value=1>Persona jurídica</option>
+                                </select>
+                            </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
                                     <button type="button" class="btn btn-info">Apellidos</button>
@@ -98,7 +110,7 @@
                                 </div>
                                 <input type="text" class="form-control">
                             </div>
-                            <div class="input-group mb-3 col-xl-6">
+                            <div class="input-group mb-3 col-6 col-xl-6">
                                 <div class="input-group-prepend">
                                     <button type="button"
                                         class="btn btn-info">Observaciones</button>

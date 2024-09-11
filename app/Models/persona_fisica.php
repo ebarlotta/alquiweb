@@ -16,10 +16,11 @@ class persona_fisica extends Model
         'dni',
         'fechanacimiento',
         'observaciones',
-        'emails_id',
-        'activo',
-        'telefono_id',
+        'email_id',
+        'telefono',
+        'whatsapp',
         'iva_id',
         'domicilio_id',
+        'activo',
     ];
 }

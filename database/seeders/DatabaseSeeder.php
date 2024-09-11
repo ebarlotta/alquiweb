@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             IvaSeeder::class,
+            LocalidadSeeder::class,
+            ProvinciaSeeder::class,
         ]);
 
     }

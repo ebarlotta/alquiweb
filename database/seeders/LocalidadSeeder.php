@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class LocalidadSeeder extends Seeder
 {
@@ -12,6 +13,6 @@ class LocalidadSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        DB::table('localidads')->insert(['localidaddescripcion' => 'Centro']);
     }
 }
