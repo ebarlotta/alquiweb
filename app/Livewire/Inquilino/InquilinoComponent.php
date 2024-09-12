@@ -81,24 +81,49 @@ class InquilinoComponent extends Component
         ->join('ivas','persona_fisicas.iva_id','ivas.id')
         ->join('provincias','domicilios.provincia_id','provincias.id')
         ->join('localidads','domicilios.localidad_id','localidads.id')
+        ->where('alqui_inquilinos.persona_type','=','fisica')
+        ->where('persona_fisicas.activo','=',true)
         ->where('persona_fisicas.nombres','like',  '%' . $this->search . '%')
         ->paginate(5);
-        // ->get();
         
         $this->inquilinos_juridica = alqui_inquilino::join('persona_juridicas','alqui_inquilinos.persona_id','persona_juridicas.id')
         ->join('domicilios','persona_juridicas.domicilio_id','domicilios.id')
         ->join('ivas','persona_juridicas.iva_id','ivas.id')
         ->join('provincias','domicilios.provincia_id','provincias.id')
         ->join('localidads','domicilios.localidad_id','localidads.id')
+        ->where('alqui_inquilinos.persona_type','=','juridica')
+        ->where('persona_juridicas.activo','=',true)
         ->where('persona_juridicas.razonsocial','like',  '%' . $this->search . '%')
         ->paginate(5);
-        // ->get();
-
     }
 
     public function CambiarPersona($persona) {
         if($persona=='fisica') $this->persona_type='fisica';
         if($persona=='juridica') $this->persona_type='juridica';
+    }
+
+    public function CargarDatosParaBorrar($id, $per_type) { 
+        $this->persona_id = $id;
+        $this->persona_type = $per_type;
+    }
+    
+    public function remove() {
+        if($this->persona_type=='fisica') {
+            $pers = persona_fisica::updateOrCreate(['id' => $this->persona_id], [
+                'activo' => false,
+            ]);
+
+        } else {
+            $pers = persona_juridica::updateOrCreate(['id' => $this->persona_id], [
+                'activo' => false,
+            ]);
+        }
+        $dom = domicilio::updateOrCreate(['id' => $pers->domicilio_id], [
+            'activo' => false,
+        ]); 
+        $this->Buscar();
+
+        session()->flash('message', 'Se guardaron los datos.');
     }
 
     public function store() {
@@ -232,8 +257,6 @@ class InquilinoComponent extends Component
             $this->localidad_id = $inquilinos_juridica[0]->localidad_id;
             $this->provincia_id = $inquilinos_juridica[0]->provincia_id;
             $this->observaciones = $inquilinos_juridica[0]->observaciones ;
-
-
         }
     }
 

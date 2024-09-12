@@ -37,5 +37,4 @@ class MonedaComponent extends Component
         $this->monedadescripcion = $moneda->monedadescripcion;
         $this->signo = $moneda->signo;
     }
-
 }

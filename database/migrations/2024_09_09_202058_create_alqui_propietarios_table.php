@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alqui_actualizacions', function (Blueprint $table) {
+        Schema::create('alqui_propietarios', function (Blueprint $table) {
             $table->id();
-            $table->string('actualizaciondescripcion');
-            $table->integer('cantmeses');
+            $table->string('persona_type');
+            $table->unsignedBigInteger('persona_id');
             $table->timestamps();
         });
     }
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('alqui_actualizacions');
+        Schema::dropIfExists('alqui_propietarios');
     }
 };

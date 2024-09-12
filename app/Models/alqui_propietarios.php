@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class alqui_actualizacion extends Model
+class alqui_propietarios extends Model
 {
     use HasFactory;
 
     protected $fillable=[
-        'actualizaciondescripcion',
-        'cantmeses',
+        'persona_type',
+        'persona_id',
     ];
 }
