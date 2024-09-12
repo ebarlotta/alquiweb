@@ -24,11 +24,14 @@ return new class extends Migration
             $table->string('bien_type');
             $table->unsignedBigInteger('bien_id');
             $table->unsignedBigInteger('inquilino_id');
-    
+            $table->unsignedBigInteger('propietario_id');
+            $table->boolean('activo');
+            
             $table->timestamps();
 
             $table->foreign('moneda_id')->references('id')->on('alqui_monedas');
             $table->foreign('inquilino_id')->references('id')->on('alqui_inquilinos');
+            $table->foreign('propietario_id')->references('id')->on('alqui_propietarios');
             $table->foreign('actualizacion_id')->references('id')->on('alqui_actualizacions');
             $table->foreign('ajuste_id')->references('id')->on('alqui_ajustes');
         });
