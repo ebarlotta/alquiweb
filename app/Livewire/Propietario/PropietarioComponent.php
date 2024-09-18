@@ -73,6 +73,7 @@ class PropietarioComponent extends Component
         $this->activo='';
         $this->razonsocial='';
         $this->cuit='';
+        $this->persona_id = null;
     }
 
     public function Buscar() {
@@ -200,19 +201,19 @@ class PropietarioComponent extends Component
                 'activo' => true,
             ]);
         }
-
-        $propietario = new alqui_propietarios;
-        $propietario->persona_type = $this->persona_type;
-        $propietario->persona_id = $pers->id;
-        $propietario->save();
-
+        if($this->persona_id) {} else {
+            $propietario = new alqui_propietarios;
+            $propietario->persona_type = $this->persona_type;
+            $propietario->persona_id = $pers->id;
+            $propietario->save();
+        }
         $this->persona_id = null;
         $this->domicilio_id = null;
         session()->flash('message', 'Se guardaron los datos.');
     }
 
     public function edit($id, $per_type) {
-        
+        $this->persona_id = $id;
         $this->persona_type = $per_type;
         if($per_type=='fisica') {
             $propietarios_fisica = alqui_propietarios::join('persona_fisicas','alqui_propietarios.persona_id','persona_fisicas.id')

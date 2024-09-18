@@ -43,4 +43,31 @@ class alqui_contrato extends Model
         'seguro_observaciones',
         'bien_id',
     ];
+
+    public function inquilino() {
+        
+        $a = alqui_inquilino::find($this->inquilino_id);
+        
+        if($a->persona_type == 'fisica') { 
+            $b = persona_fisica::find($a->persona_id);
+            $resul = $b->apellidos.', ' .$b->nombres;
+        } else {
+            $b = persona_juridica::find($a->persona_id);
+            $resul = $b->razonsocial;
+        }
+        return $resul;
+    }
+
+    public function propietario() {
+        $a = alqui_propietarios::find($this->propietario_id);
+        
+        if($a->persona_type == 'fisica') { 
+            $b = persona_fisica::find($a->persona_id);
+            $resul = $b->apellidos.', ' .$b->nombres;
+        } else {
+            $b = persona_juridica::find($a->persona_id);
+            $resul = $b->razonsocial;
+        }
+        return $resul;
+    }
 }

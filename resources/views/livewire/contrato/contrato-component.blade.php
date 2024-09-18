@@ -4,8 +4,13 @@
         #titulo { text-align: center; background-color: rgb(107 133 114); margin-bottom: 10px; padding: 5px; font-size: 14px; color: #ffffff; height: 35px; }
         .encabezado_card { text-align: center; background-color: rgb(107 133 114); margin-bottom: 10px; padding: 5px; font-size: 14px; color: #ffffff; height: 35px; }
     </style>
-
-
+    @if(Session::has('mensaje'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
+            {{Session::get('mensaje')}}
+        </div>  
+    @endif
     <div class="col-12 d-flex flex-wrap">
         <div class="col-6 col-sm-6">
 
@@ -19,7 +24,7 @@
                         </div>
                         <select class="form-control" wire:model="bien_type">
                             <option value="0" selected>-- Seleccione uno --</option>
-                            <option value="1">Alquiler</option>
+                            <option value="1">Alquiler local/casa</option>
                             <option value="2">Vehículo</option>
                             <option value="3">Mueble</option>
                         </select>
@@ -117,7 +122,6 @@
                     <div class="col-2 mb-2 rounded-md text-center" style="background-color: lightseagreen">
                         <b>&nbsp;ACTIVO</b>
                     </div>
-
                     <div>
                         <div class="text-center">
                             <button class="btn btn-primary">Rescindir contrato</button>
@@ -159,7 +163,6 @@
                             <div class="encabezado_card">No Cobra</div>
                         @endif
                     @endif
-
                     @if($intereses_punitorios_id<>3)
                         <div class="card-body d-flex flex-wrap">
                             <div class="input-group mb-3 col-12 col-sm-6">
@@ -171,29 +174,25 @@
                                 <label type="button" class="btn btn-info">Día Inicio cálculo</label>
                                 <input class="form-control" type="number" wire:model="c_general_dia_inicio">
                                 @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
-
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <label type="button" class="btn btn-info">Días de gracia</label>
                                 <input class="form-control" type="number" wire:model="c_general_dias_gracia">
-                                @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
-
+                                @error('c_general_dias_gracia') <span>{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <label type="button" class="btn btn-info">Porcentaje</label>
                                 <input class="form-control" type="number" wire:model="c_general_porcentaje">
-                                @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
-
+                                @error('c_general_porcentaje') <span>{{ $message }}</span>@enderror
                             </div>                        
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <input type="checkbox" class="mr-1 col-1" wire:model="reintegrar_punitorios">Reintegrar punitorios al Propietario
-                                @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
+                                @error('reintegrar_punitorios') <span>{{ $message }}</span>@enderror
 
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <input type="checkbox" class="mr-1 col-1" wire:model="cobrar_administrativos_punitorios">Cobrar admininstrativos sobre punitorios
-                                @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
-
+                                @error('cobrar_administrativos_punitorios') <span>{{ $message }}</span>@enderror
                             </div>
                         </div>
                         <div class="card-body flex-wrap">
@@ -207,71 +206,7 @@
 
             <div class="encabezado_card">Participantes</div>
                 <div class="card-body d-flex flex-wrap">
-                    {{-- <div class="col-6">
-                        <div class="input-group mb-3 col-12">
-                            <div class="input-group-prepend">
-                                <label type="button" class="btn btn-info" wire:keyup="Cargarlistados()">Buscar</label>
-                            </div>
-                            <input type="text" class="form-control" wire:model="search_inquilino" wire:keyup="Cargarlistados()">
-                            @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
-
-                        </div>
-                        <table class="table" border="1">
-                            <tr>
-                                <td colspan="2">Inquilinos</td>
-                            </tr>
-                            <tr>
-                                <td>Física</td><td>Jurídica</td>    
-                            </tr>
-                            <tr>
-                                <td>
-                                    @if($inquilinos_filtrados_fisica)
-                                    @foreach ($inquilinos_filtrados_fisica as $inquilino_fisica)
-                                        <br>{{ $inquilino_fisica->apellidos}}, {{ $inquilino_fisica->nombres}}
-                                    @endforeach
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($inquilinos_filtrados_fisica)
-                                    @foreach ($inquilinos_filtrados_juridica as $inquilino_juridica)
-                                        <br>{{ $inquilino_juridica->razonsocial}}
-                                    @endforeach
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
-                    </div> --}}
                     <div class="col-12">
-                        {{-- <div class="input-group mb-3 col-12">
-                            <div class="input-group-prepend">
-                                <label type="button" class="btn btn-info">Buscar</label>
-                            </div>
-                            <input type="text" class="form-control" wire:model="search_inquilino" wire:keyup="Cargarlistados()">
-                        </div> --}}
-                        {{-- <table class="table" border="1">
-                            <tr>
-                                <td colspan="2">Propietarios</td>
-                            </tr>
-                            <tr>
-                                <td>Física</td><td>Jurídica</td>    
-                            </tr>
-                            <tr>
-                                <td>
-                                    @if($inquilinos_filtrados_fisica)
-                                    @foreach ($propietarios_filtrados_fisica as $propietario_fisica)
-                                        <br>{{ $propietario_fisica->apellidos}}, {{ $propietario_fisica->nombres}}
-                                    @endforeach
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($inquilinos_filtrados_fisica)
-                                    @foreach ($propietarios_filtrados_juridica as $propietario_juridica)
-                                        <br>{{ $propietario_juridica->razonsocial}}
-                                    @endforeach
-                                    @endif
-                                </td>
-                            </tr>
-                        </table> --}}
                         <table class="table table-striped col-12">
                             <tr class="w-1/4">
                                 <td>Propietario</td>
@@ -285,62 +220,30 @@
                             </tr>
                             <tr class="w-1/4">
                                 <td>Garantes</td>
-                                <td><input type="text" class="form-control" wire:model="garante_text"></td>
+                                <td>
+                                    @if($garantes)
+                                        @foreach($garantes as $garante)                                        
+                                            <div class="input-group">
+                                                <div class="input-group-prepend">
+                                                    <span class="input-group-text">
+                                                        <input type="checkbox" value="{{ $garante[1] }}" wire:click="EliminarGarante({{ $garante[1] }})">
+                                                    </span>
+                                                </div>
+                                                <input type="text" class="form-control" value="{{ $garante[0] }}">
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </td>
                                 <td><input type="button" value="Buscar" class="form-control btn-primary" wire:click="CargarListado('Garantes')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
                             </tr>
                         </table>
                     </div>
                 </div>
             </div>
-            {{-- Conf Particular --}}
-            {{-- <div class="card">
-                <div class="encabezado_card">Config. particular</div>
-                <div class="card-body d-flex flex-wrap">
-                    <div class="input-group mb-3 col-12 col-sm-6">
-                        <label type="button" class="btn btn-info">Porcentaje diario</label>
-                        <input type="number" class="form-control">
-                    </div>
-                    <div class="input-group mb-3 col-12 col-sm-6">
-                        <label type="button" class="btn btn-info">Día inicio cálculo</label>
-                        <input type="number" class="form-control">
-                    </div>
-                    <div class="input-group mb-3 col-12 col-sm-6">
-                        <label type="button" class="btn btn-info">Días de gracia</label>
-                        <input type="number" class="form-control">
-                    </div>
-                    <div class="input-group mb-3 col-12 col-sm-6">
-                        <label type="button" class="btn btn-info">Base de cálculo</label>
-                        <select class="form-control">
-                            <option value="0" selected="">Únicamente el alquiler</option>
-                            <option value="1">Todos los conceptos</option>
-                        </select>                                                
-                    </div>
-                    <hr>
-                    <div class="switch_div">
-                        <label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label>
-                        <span class="textoSwitch">Reintegrar punitorios al Propietario</span>                                        
-                    </div>
-                    <div class="switch_div" id="ctr_switchAdmPunit" style="display: none;">
-                        <label class="switch">
-                            <input type="checkbox">
-                            <span class="slider round"></span>
-                        </label>
-                        <span class="textoSwitch">Cobrar admin sobre punitorios</span>                                        
-                    </div>
-                    <div class="input-group" style="width: 100%; display: none;" id="contr__ctr_punit_admPunit_ig">
-                        <span id="contr__ctr_punit_admPunit_label" class="input-group-addon">Porcentaje</span>
-                        <input type="number" class="bd form-control" id="contr__ctr_punit_admPunit" field="ctr_punit_admPunit" grupo="contr" item="" autocomplete="NoGracias">
-                    </div>
-                </div>
-            </div> --}}
             
-        {{-- </div> --}}
 
+        {{-- Valores --}}
         <div class="col-6 col-sm-6">
-            {{-- Valores --}}
             <div class="card">
                 <div class="encabezado_card">Valores</div>
                 <div class="card-body d-flex flex-wrap">
@@ -385,7 +288,6 @@
                             <option value="0">Otro</option>
                         </select>
                         @error('ajuste_id') <span>{{ $message }}</span>@enderror
-
                     </div>
                     <table class="col-12 table table-striped">
                         <tr>
@@ -393,70 +295,19 @@
                             <td style="text-align: center;"><b>Hasta</b></td>
                             <td style="text-align: center;"><b>Valor</b></td>
                         </tr>
-                        
-                            {!! $html !!}
-                        
+                            {!! $html !!}                        
                     </table>
-                    
-                {{-- </div>
-                <div class="card-body d-flex flex-wrap"> --}}
-                    {{-- <div class="col-12">
-                        <div class="d-flex justify-content-around">
-                            <div>Desde</div>
-                            <div>Hasta</div>
-                            <div>Valor</div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-around">
-                                <div>Cuota 1 <br><label style="font-size: 0.7rem">01/08/2024</label></div>
-                                <div>Cuota 12<br><label style="font-size: 0.7rem">31/07/2025</label></div>
-                                <div>
-                                    <input type="text" size="6"><br>
-                                    <label style="font-size: 0.7rem">Valor Actual</label>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-around">
-                                <div>Cuota 13 <label style="font-size: 0.7rem">01/08/2025</label></div>
-                                <div>Cuota 24<label style="font-size: 0.7rem">31/07/2026</label></div>
-                                <div>
-                                    <input type="text" size="6">
-                                    <label style="font-size: 0.7rem">Valor Actual</label>
-                                </div>
-                            </div>
-                            <div class="d-flex justify-content-around">
-                                <div>Cuota 25<label style="font-size: 0.7rem">01/08/2026</label></div>
-                                <div>Cuota 36<label style="font-size: 0.7rem">31/07/2027</label></div>
-                                <div>
-                                    <input type="text" size="6">
-                                    <label style="font-size: 0.7rem">Valor Actual</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="alert justify-content-around" role="alert" style="background-color: lightyellow;color: black;">
-                            <i class="fa fa-exclamation-circle justify-content-around"></i>
-                            <p class="black">Este contrato no tiene conceptos</p>
-                            <hr>
-                            <div class="input-group-prepend justify-content-around">
-                                <button type="button" class="btn btn-info">Agregar Conceptos</button>
-                            </div>
-                        </div>
-                        <div class="input-group-prepend">
-                            <input type="checkbox" class="mr-3 col-1"> Liquidación Fraccionada
-                        </div>
-
-                    </div> --}}
                 </div>
             </div>
 
             {{-- Herramientas --}}
-            {{-- <div class="card">
+            <div class="card">
                 <div class="encabezado_card">Herramientas</div>
                 <div class="card-body flex-wrap text-center">
                     <button class="btn btn-primary">Agregar conceptos</button>
                     <button class="btn btn-primary">Eliminar contrato</button>
                 </div>
-            </div> --}}
+            </div>
 
             {{-- Gastos --}}
             <div class="card">
@@ -518,7 +369,7 @@
             </div>
 
             {{-- Grupo --}}
-            <div class="card">
+            {{-- <div class="card">
                 <div class="encabezado_card">Grupo </div>
                 <h1 class="red">PARA TERMINAR</h1>
                 <div class="card-body d-flex flex-wrap">
@@ -559,7 +410,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
             
         </div>
 
@@ -582,12 +433,14 @@
                     </button>
                 </div>
                 <div class="px-3 py-3">
+                    <input class="form-control w-full col-12 pr-5" type="text" placeholder="Buscar" wire:model="search" wire:keyup="Cargarlistados()">
+
                     @if($listado_fisicas)
                         <label for="">Persona Física</label><br>
                         @foreach ($listado_fisicas as $fisica)
                         {{-- @foreach($listado_fisicas as $fisica) --}}
                             <label class="px-3" style="background-color: lightgreen;padding: 3px;width: 76%;margin-right: 3px; border-radius: 4px;">{{ $fisica->apellidos}}, {{ $fisica->nombres }}</label>
-                            <input class="px-3" type="button" value="Elegir" style="background-color: lightcoral; padding: 3px;width: 19%;margin-right: 3px; border-radius: 4px;" wire:click="Elegir('fisica',{{ $fisica->persona_id }})">
+                            <input class="px-3" type="button" value="Elegir" style="background-color: lightcoral; padding: 3px;width: 19%;margin-right: 3px; border-radius: 4px;" wire:click="Elegir('fisica',{{ $fisica->persona_id }})" data-dismiss="modal" aria-label="Close">
                         @endforeach
                     @else
                         No hay datos
@@ -597,7 +450,7 @@
                         @foreach ($listado_juridicas as $juridica)
                         {{-- @foreach($listado_fisicas as $fisica) --}}
                             <label class="px-3" style="background-color: lightgreen;padding: 3px;width: 76%;margin-right: 3px; border-radius: 4px;">{{ $juridica->razonsocial }}</label>
-                            <input class="px-3" type="button" value="Elegir" style="background-color: lightcoral; padding: 3px;width: 19%;margin-right: 3px; border-radius: 4px;" wire:click="Elegir('juridica',{{ $juridica->persona_id }})">
+                            <input class="px-3" type="button" value="Elegir" style="background-color: lightcoral; padding: 3px;width: 19%;margin-right: 3px; border-radius: 4px;" wire:click="Elegir('juridica',{{ $juridica->persona_id }})" data-dismiss="modal" aria-label="Close">
                         @endforeach
                     @else
                         No hay datos

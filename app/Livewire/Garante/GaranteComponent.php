@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Livewire\Inquilino;
+namespace App\Livewire\Garante;
 
 use Livewire\Component;
-use App\Models\alqui_inquilino;
+use App\Models\alqui_garante;
 use App\Models\persona_fisica;
 use App\Models\persona_juridica;
 use App\Models\domicilio;
@@ -12,14 +12,14 @@ use App\Models\provincia as provincias;
 use App\Models\localidad as localidades;
 use Livewire\WithPagination;
 
-class InquilinoComponent extends Component
+class GaranteComponent extends Component
 {
-    //alqui_inquilino
+    //alqui_garante
     public $persona_type, $persona_id, $search;
 
     public $ivas, $provincias, $localidades, $provincia_id, $localidad_id;
-    protected $inquilinos_fisica;
-    protected $inquilinos_juridica;
+    protected $garantes_fisica;
+    protected $garantes_juridica;
 
     //pers_fisica
     public $calle, $apellidos, $nombres, $cuil, $dni, $telefono, $whatsapp, $email_id, $iva_id, $fechanacimiento, $fechainicioact, $domicilio_id, $observaciones, $activo;
@@ -38,12 +38,12 @@ class InquilinoComponent extends Component
         $this->provincias = provincias::all();
         $this->localidades = localidades::all();
 
-        // $this->inquilinos = persona_fisica::all();
+        // $this->garantes = persona_fisica::all();
 
         $this->Buscar();
 
-        // dd($this->inquilinos_juridica);
-        return view('livewire.inquilino.inquilino-component',['inquilinos_fisica'=>$this->inquilinos_fisica,'inquilinos_juridica'=>$this->inquilinos_juridica])->extends('adminlte::page');
+        // dd($this->garantes_juridica);
+        return view('livewire.garante.garante-component',['garantes_fisica'=>$this->garantes_fisica,'garantes_juridica'=>$this->garantes_juridica])->extends('adminlte::page');
     }
 
     public function Nuevo() {
@@ -55,8 +55,8 @@ class InquilinoComponent extends Component
         $this->localidades='';
         $this->provincia_id='';
         $this->localidad_id='';
-        $this->inquilinos_fisica='';
-        $this->inquilinos_juridica='';
+        $this->garantes_fisica='';
+        $this->garantes_juridica='';
         $this->calle='';
         $this->apellidos='';
         $this->nombres='';
@@ -77,22 +77,22 @@ class InquilinoComponent extends Component
     }
 
     public function Buscar() {
-        $this->inquilinos_fisica = alqui_inquilino::join('persona_fisicas','alqui_inquilinos.persona_id','persona_fisicas.id')
+        $this->garantes_fisica = alqui_garante::join('persona_fisicas','alqui_garantes.persona_id','persona_fisicas.id')
         ->join('domicilios','persona_fisicas.domicilio_id','domicilios.id')
         ->join('ivas','persona_fisicas.iva_id','ivas.id')
         ->join('provincias','domicilios.provincia_id','provincias.id')
         ->join('localidads','domicilios.localidad_id','localidads.id')
-        ->where('alqui_inquilinos.persona_type','=','fisica')
+        ->where('alqui_garantes.persona_type','=','fisica')
         ->where('persona_fisicas.activo','=',true)
         ->where('persona_fisicas.nombres','like',  '%' . $this->search . '%')
         ->paginate(5);
         
-        $this->inquilinos_juridica = alqui_inquilino::join('persona_juridicas','alqui_inquilinos.persona_id','persona_juridicas.id')
+        $this->garantes_juridica = alqui_garante::join('persona_juridicas','alqui_garantes.persona_id','persona_juridicas.id')
         ->join('domicilios','persona_juridicas.domicilio_id','domicilios.id')
         ->join('ivas','persona_juridicas.iva_id','ivas.id')
         ->join('provincias','domicilios.provincia_id','provincias.id')
         ->join('localidads','domicilios.localidad_id','localidads.id')
-        ->where('alqui_inquilinos.persona_type','=','juridica')
+        ->where('alqui_garantes.persona_type','=','juridica')
         ->where('persona_juridicas.activo','=',true)
         ->where('persona_juridicas.razonsocial','like',  '%' . $this->search . '%')
         ->paginate(5);
@@ -201,12 +201,11 @@ class InquilinoComponent extends Component
                 'activo' => true,
             ]);
         }
-
         if($this->persona_id) {} else {
-            $inquilino = new alqui_inquilino;
-            $inquilino->persona_type = $this->persona_type;
-            $inquilino->persona_id = $pers->id;
-            $inquilino->save();
+            $garante = new alqui_garante;
+            $garante->persona_type = $this->persona_type;
+            $garante->persona_id = $pers->id;
+            $garante->save();
         }
 
         $this->persona_id = null;
@@ -218,48 +217,48 @@ class InquilinoComponent extends Component
         $this->persona_id = $id;
         $this->persona_type = $per_type;
         if($per_type=='fisica') {
-            $inquilinos_fisica = alqui_inquilino::join('persona_fisicas','alqui_inquilinos.persona_id','persona_fisicas.id')
+            $garantes_fisica = alqui_garante::join('persona_fisicas','alqui_garantes.persona_id','persona_fisicas.id')
             ->join('domicilios','persona_fisicas.domicilio_id','domicilios.id')
             ->join('ivas','persona_fisicas.iva_id','ivas.id')
             ->join('provincias','domicilios.provincia_id','provincias.id')
             ->join('localidads','domicilios.localidad_id','localidads.id')
             ->where('persona_id','=',$id)
             ->get();
-            // dd($inquilinos_fisica);
-            $this->cuil = $inquilinos_fisica[0]->cuil ;
-            $this->apellidos = $inquilinos_fisica[0]->apellidos ;
-            $this->nombres = $inquilinos_fisica[0]->nombres ;
-            $this->dni = $inquilinos_fisica[0]->dni ;
-            $this->telefono = $inquilinos_fisica[0]->telefono ;
-            $this->whatsapp = $inquilinos_fisica[0]->whatsapp ;
-            $this->email_id = $inquilinos_fisica[0]->email_id ;
-            $this->iva_id = $inquilinos_fisica[0]->iva_id ;
-            $this->fechanacimiento = $inquilinos_fisica[0]->fechanacimiento ;
-            $this->calle = $inquilinos_fisica[0]->calle;
-            $this->localidad_id = $inquilinos_fisica[0]->localidad_id;
-            $this->provincia_id = $inquilinos_fisica[0]->provincia_id;
-            $this->observaciones = $inquilinos_fisica[0]->observaciones ;
+            // dd($garantes_fisica);
+            $this->cuil = $garantes_fisica[0]->cuil ;
+            $this->apellidos = $garantes_fisica[0]->apellidos ;
+            $this->nombres = $garantes_fisica[0]->nombres ;
+            $this->dni = $garantes_fisica[0]->dni ;
+            $this->telefono = $garantes_fisica[0]->telefono ;
+            $this->whatsapp = $garantes_fisica[0]->whatsapp ;
+            $this->email_id = $garantes_fisica[0]->email_id ;
+            $this->iva_id = $garantes_fisica[0]->iva_id ;
+            $this->fechanacimiento = $garantes_fisica[0]->fechanacimiento ;
+            $this->calle = $garantes_fisica[0]->calle;
+            $this->localidad_id = $garantes_fisica[0]->localidad_id;
+            $this->provincia_id = $garantes_fisica[0]->provincia_id;
+            $this->observaciones = $garantes_fisica[0]->observaciones ;
             // dd('termino');
         } else {
             $this->persona_type='juridica';
 
-            $inquilinos_juridica = alqui_inquilino::join('persona_juridicas','alqui_inquilinos.persona_id','persona_juridicas.id')
+            $garantes_juridica = alqui_garante::join('persona_juridicas','alqui_garantes.persona_id','persona_juridicas.id')
             ->join('domicilios','persona_juridicas.domicilio_id','domicilios.id')
             ->join('provincias','domicilios.provincia_id','provincias.id')
             ->join('localidads','domicilios.localidad_id','localidads.id')
             ->where('persona_id','=',$id)
             ->get();
-            $this->cuit = $inquilinos_juridica[0]->cuit ;
-            $this->razonsocial = $inquilinos_juridica[0]->razonsocial ;
-            $this->telefono = $inquilinos_juridica[0]->telefono ;
-            $this->whatsapp = $inquilinos_juridica[0]->whatsapp ;
-            $this->email_id = $inquilinos_juridica[0]->email_id ;
-            $this->iva_id = $inquilinos_juridica[0]->iva_id ;
-            $this->fechainicioact = $inquilinos_juridica[0]->fechainicioact ;
-            $this->calle = $inquilinos_juridica[0]->calle;
-            $this->localidad_id = $inquilinos_juridica[0]->localidad_id;
-            $this->provincia_id = $inquilinos_juridica[0]->provincia_id;
-            $this->observaciones = $inquilinos_juridica[0]->observaciones ;
+            $this->cuit = $garantes_juridica[0]->cuit ;
+            $this->razonsocial = $garantes_juridica[0]->razonsocial ;
+            $this->telefono = $garantes_juridica[0]->telefono ;
+            $this->whatsapp = $garantes_juridica[0]->whatsapp ;
+            $this->email_id = $garantes_juridica[0]->email_id ;
+            $this->iva_id = $garantes_juridica[0]->iva_id ;
+            $this->fechainicioact = $garantes_juridica[0]->fechainicioact ;
+            $this->calle = $garantes_juridica[0]->calle;
+            $this->localidad_id = $garantes_juridica[0]->localidad_id;
+            $this->provincia_id = $garantes_juridica[0]->provincia_id;
+            $this->observaciones = $garantes_juridica[0]->observaciones ;
         }
     }
 

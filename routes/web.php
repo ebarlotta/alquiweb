@@ -4,8 +4,10 @@ use App\Livewire\Actualizacion\ActualizacionComponent;
 use App\Livewire\Ajuste\AjusteComponent;
 use App\Livewire\Bienes\BienesComponent;
 use App\Livewire\Contrato\ContratoComponent;
+use App\Livewire\Garante\GaranteComponent;
 use App\Livewire\Moneda\MonedaComponent;
 use App\Livewire\Inquilino\InquilinoComponent;
+use App\Livewire\Principal\PrincipalComponent;
 use App\Livewire\Propietario\PropietarioComponent;
 use App\Livewire\Tipopropiedades\TipopropiedadesComponent;
 use App\Livewire\Tipopropietario\TipopropietarioComponent;
@@ -25,9 +27,11 @@ Route::middleware([
     })->name('dashboard');
 });
 
+Route::get('/principal', PrincipalComponent::class)->name('principal');
 Route::get('/bienes', BienesComponent::class)->name('bienes');
 Route::get('/propietarios', PropietarioComponent::class)->name('propietarios');
 Route::get('/inquilinos', InquilinoComponent::class)->name('inquilinos');
+Route::get('/garantes', GaranteComponent::class)->name('garantes');
 Route::get('/contratos', ContratoComponent::class)->name('contratos');
 Route::get('/tipospropiedades', TipopropiedadesComponent::class)->name('tipospropiedades');
 Route::get('/tipospropietarios', TipopropietarioComponent::class)->name('tipospropietarios');

@@ -339,6 +339,11 @@ return [
             'icon' => 'fas fa-fw fa-lock',
         ],
         [
+            'text' => 'Garantes',
+            'url' => 'garantes',
+            'icon' => 'fas fa-fw fa-lock',
+        ],
+        [
             'text' => 'Contratos',
             'url' => 'contratos',
             'icon' => 'fas fa-fw fa-lock',

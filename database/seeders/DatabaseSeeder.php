@@ -24,6 +24,9 @@ class DatabaseSeeder extends Seeder
             IvaSeeder::class,
             LocalidadSeeder::class,
             ProvinciaSeeder::class,
+            SeguroSeeder::class,
+            AlquiAjusteSeeder::class,
+            AlquiActualizacionSeeder::class,
         ]);
 
     }

@@ -1,5 +1,11 @@
 <div>
-
+    @if(Session::has('mensaje'))
+        <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
+            {{Session::get('mensaje')}}
+        </div>  
+    @endif
     <div class="d-flex" style="justify-">
         <h1>Listado de Monedas</h1><input type="button" class="btn btn-success col-1 ml-2" style="height:30px;" value="+" data-toggle="modal" data-target="#ModalNuevaMoneda">
     </div>
