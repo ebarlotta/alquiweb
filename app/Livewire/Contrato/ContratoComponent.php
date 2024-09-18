@@ -29,23 +29,29 @@ class ContratoComponent extends Component
 
     public $inquilinos_filtrados_fisica_id,$inquilinos_filtrados_juridica_id,$propietarios_filtrados_fisica_id,$propietarios_filtrados_juridica_id, $lugar_pago_inquilino=1;
     public $bien_type=1, $periodos_observaciones='', $detalles_administra='', $detalles_lugar_pago, $detalles_cartera='', $estado=false, $actualizaciones_id, $tipoajustes_id;
-    public $incluir_mora_graficos=true, $c_general_por_diario, $c_general_dia_inicio, $c_general_dias_gracia,$c_general_porcentaje;
+    public $incluir_mora_graficos=true;
     public $c_part_por_diario, $c_part_dia_inicio, $c_part_dias_gracia, $c_part_porcentaje;
     public $porcentaje_administrativos=0, $valor_administrativos=0, $administra_alquiler_id=1, $activo, $gastos_administrativos_id=1, $inquilino_id, $propietario_id, $cobrar_administrativos_punitorios=false, $reintegrar_punitorios=false, $moneda_id, $ajuste_id, $admin_porc, $admin_monto, $seguro_id=3, $vencimiento, $seguro_observaciones;
 
+    public $c_general_por_diario=0, $c_general_dia_inicio=0, $c_general_dias_gracia=0,$c_general_porcentaje=0;
+
     public $propietario_text, $inquilino_text, $garante_text, $buscar, $listado_fisicas, $listado_juridicas;
-    public $garantes, $garantes_ids;
+    public $garantes, $garantes_ids, $numero;
+    public $valor = [60];
+    
+    public $updateTypes = [];
 
     public function mount() { $this->fechainicio = date_create()->format('Y-m-d'); }
 
     public function render()
     {
-
+        // $this->valor = array_fill(0, 60, null);
+        
         $this->bien_id = 1;
 
         $this->Cargarlistados();
         $this->monedas = alqui_moneda::all();
-        $this->actualizaciones = alqui_actualizacion::all();
+        $this->actualizaciones = alqui_actualizacion::orderby('cantmeses')->get();
         $this->tipoajustes = alqui_ajuste::all();
         $this->CambiarFechaInicio();
         $this->CambiarActualizacion();
@@ -56,6 +62,20 @@ class ContratoComponent extends Component
     public function CambiarCuotas() { $this->cuotas = $this->duracion * 12; $this->CambiarActualizacion(); }
     public function CambiarFechaInicio() { $this->fechafin = date("Y-m-d", strtotime($this->fechainicio . "+ ".$this->duracion." year")); }
     public function CambiarIntereses() { $this->intereses_punitorios_id = $this->intereses_punitorios_id; }
+
+    public function CambiarValores() { 
+        // $this->updateTypes(count($this->updateTypes));
+        
+        // $a= count($this->updateTypes);
+        // array_push($this->updateTypes, [
+        //     "id" => $a,
+        //     "qty" => 'pepe',
+        // ]);
+        
+        dd($this->updateTypes);
+    }
+    // public function CambiarValores($id, $val) { $this->valor[$id] = $val;  dd( $this->valor[$id]);}
+    public function CambiarSeguro() { $this->seguro_id = $this->seguro_id;  if($this->seguro_id==3) $this->vencimiento=date(now()); }
     public function CambiarAdministrativos() { 
         $this->gastos_administrativos = $this->gastos_administrativos; 
         if($this->gastos_administrativos==2) { $this->porcentaje_administrativos = 0; } else { $this->valor_administrativos = 0; }
@@ -70,12 +90,23 @@ class ContratoComponent extends Component
         $fecha_final = date("Y-m-d", strtotime($fecha_inicial . "+ ".$this->cant_meses." months"));
         for($i=1; $i<$this->cuotas/$this->cant_meses + 1; $i++) {
             
-            $html1=$html1.'<tr><td style="text-align: center;">Cuota '.$a.' <br><label style="font-size: 0.7rem">'.substr($fecha_inicial,8,2).'-'.substr($fecha_inicial,5,2).'-'.substr($fecha_inicial,0,4).'</label></td>
-                            <td style="text-align: center;">Cuota '. $i*$this->cant_meses. '<br><label style="font-size: 0.7rem">'.substr($fecha_final,8,2).'-'.substr($fecha_final,5,2).'-'.substr($fecha_final,0,4).'</label></td>
-                            <td style="text-align: center;">
-                                <input type="number" size="6"><br>
-                                <label style="font-size: 0.8rem">Valor Actual</label>
-                            </td></tr>';
+            $html1=$html1.'<tr>
+                                <td style="text-align: center;">Cuota '.$a.' <br>
+                                    <label style="font-size: 0.7rem">'.substr($fecha_inicial,8,2).'-'.substr($fecha_inicial,5,2).'-'.substr($fecha_inicial,0,4).'</label>
+                                </td>
+                                <td style="text-align: center;">Cuota '. $i*$this->cant_meses. '<br>
+                                    <label style="font-size: 0.7rem">'.substr($fecha_final,8,2).'-'.substr($fecha_final,5,2).'-'.substr($fecha_final,0,4).'</label>
+                                </td>
+                                <td style="text-align: center;">';
+            if($i==1) { $html1 = $html1 . '<input type="number" size="16" wire:model="updateTypes.'.$i.'" style="background-color: aquamarine;"><br>
+                <label style="font-size: 0.8rem">
+                    Valor Inicial
+                </label>'; } 
+            else { $html1 = $html1 . '<input type="number" size="16" wire:model="updateTypes.'.$i.'"><br>
+                <label style="font-size: 0.8rem">Valor Parcial</label>'; }
+            $html1 = $html1 . '</td>
+                            </tr>';
+        
             $a = $i*$this->cant_meses+1;
 
             $fecha_inicial = date("Y-m-d", strtotime($fecha_final . "+ 1 days")); 
@@ -130,26 +161,7 @@ class ContratoComponent extends Component
 
     public function store() {
 
-        // dd($this->c_general_por_diario);
-
-        $this->tipoajustes_id = 22;
-        // 'inquilinos_filtrados_fisica_id'=>$this->inquilinos_filtrados_fisica_id,
-        // 'inquilinos_filtrados_juridica_id'=>$this->inquilinos_filtrados_juridica_id,
-        // 'propietarios_filtrados_fisica_id'=>$this->propietarios_filtrados_fisica_id,
-        // 'propietarios_filtrados_juridica_id'=>$this->propietarios_filtrados_juridica_id,
-        // if($this->intereses_punitorios_id==1) {
-        //     $porcentaje_diario = $this->c_general_por_diario;
-        //     $dia_inicio = $this->c_general_dia_inicio;
-        //     $dias_gracia = $this->c_general_dias_gracia;
-        //     $base_de_calculo = $this->c_general_porcentaje;
-        // } else {
-        //     $porcentaje_diario= $this->c_part_por_diario;
-        //     $dia_inicio= $this->c_part_dia_inicio;
-        //     $dias_gracia= $this->c_part_dias_gracia;
-        //     $base_de_calculo= $this->c_part_porcentaj;
-        // }
-
-        $this->validate = [
+        $this->validate ([
             'bien_id'=>'required',
             'duracion'=>'required',
             'cuotas'=>'required',
@@ -166,6 +178,11 @@ class ContratoComponent extends Component
             'administra_alquiler_id'=>'required',
             'lugar_pago_inquilino'=>'required',
             
+            'c_general_por_diario'=>'required',
+            'c_general_dia_inicio'=>'required',
+            'c_general_dias_gracia'=>'required',
+            'c_general_porcentaje'=>'required',
+
             'intereses_punitorios_id'=>'required',
             
             'gastos_administrativos_id'=>'required',
@@ -177,7 +194,15 @@ class ContratoComponent extends Component
         
             'seguro_id'=>'required',
             'vencimiento'=>'required',
-        ];
+
+            'inquilino_id'=>'required',
+            'propietario_id'=>'required',
+            'garantes'=>'required',
+
+            // 'updateTypes'=>'required|numeric',
+        ]);
+        // dd(json_encode($this->updateTypes));
+
 // dd($this->propietario_id."pppp");
         $a = alqui_contrato::updateOrCreate(['id' => $this->contrato_id],[
             'bien_id'=>$this->bien_id,
@@ -220,6 +245,8 @@ class ContratoComponent extends Component
             'vencimiento'=>$this->vencimiento,
             'seguro_observaciones'=>$this->seguro_observaciones,
             'activo' => true,
+
+            'valores' => json_encode($this->updateTypes),
 
         ]);
 

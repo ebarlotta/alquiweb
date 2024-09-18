@@ -42,14 +42,15 @@ class alqui_contrato extends Model
         'vencimiento',
         'seguro_observaciones',
         'bien_id',
+        'valores',
     ];
 
     public function inquilino() {
         
-        $a = alqui_inquilino::find($this->inquilino_id);
-        
-        if($a->persona_type == 'fisica') { 
-            $b = persona_fisica::find($a->persona_id);
+        $a = alqui_inquilino::where('persona_id','=',$this->inquilino_id)->get();
+
+        if($a[0]->persona_type == 'fisica') { 
+            $b = persona_fisica::find($a[0]->persona_id);
             $resul = $b->apellidos.', ' .$b->nombres;
         } else {
             $b = persona_juridica::find($a->persona_id);
@@ -59,10 +60,10 @@ class alqui_contrato extends Model
     }
 
     public function propietario() {
-        $a = alqui_propietarios::find($this->propietario_id);
+        $a = alqui_propietarios::where('persona_id','=',$this->propietario_id)->get();
         
-        if($a->persona_type == 'fisica') { 
-            $b = persona_fisica::find($a->persona_id);
+        if($a[0]->persona_type == 'fisica') { 
+            $b = persona_fisica::find($a[0]->persona_id);
             $resul = $b->apellidos.', ' .$b->nombres;
         } else {
             $b = persona_juridica::find($a->persona_id);

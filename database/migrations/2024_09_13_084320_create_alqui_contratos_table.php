@@ -52,13 +52,14 @@ return new class extends Migration
             $table->string('seguro_observaciones')->nullable();
 
             $table->boolean('liquidacion_fraccionada')->default(0);
+            $table->string('valores')->default(0);
             
 
             $table->timestamps();
 
             $table->foreign('moneda_id')->references('id')->on('alqui_monedas');
-            $table->foreign('inquilino_id')->references('id')->on('alqui_inquilinos');
-            $table->foreign('propietario_id')->references('id')->on('alqui_propietarios');
+            // $table->foreign('inquilino_id')->references('persona_id')->on('alqui_inquilinos');
+            // $table->foreign('propietario_id')->references('persona_id')->on('alqui_propietarios');
             $table->foreign('actualizacion_id')->references('id')->on('alqui_actualizacions');
             $table->foreign('ajuste_id')->references('id')->on('alqui_ajustes');
             // $table->foreign('intereses_punitorios_id')->references('id')->on('intereses_punitorios');

@@ -4,6 +4,9 @@
         #titulo { text-align: center; background-color: rgb(107 133 114); margin-bottom: 10px; padding: 5px; font-size: 14px; color: #ffffff; height: 35px; }
         .encabezado_card { text-align: center; background-color: rgb(107 133 114); margin-bottom: 10px; padding: 5px; font-size: 14px; color: #ffffff; height: 35px; }
     </style>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+
     @if(Session::has('mensaje'))
         <div class="alert alert-success alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -28,8 +31,8 @@
                             <option value="2">Vehículo</option>
                             <option value="3">Mueble</option>
                         </select>
-                        @error('bien_type') <span>{{ $message }}</span>@enderror
                     </div>
+                    @error('bien_type') <span class="text-red-500">{{ $message }}</span>@enderror
                 </div>
             </div>
 
@@ -49,35 +52,35 @@
                             <option value="5">5 años</option>
                             <option value="0">Otro</option>
                         </select>
-                        @error('duracion') <span>{{ $message }}</span>@enderror
+                        @error('duracion') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Inicio</label>
                         </div>
                         <input type="date" class="form-control" wire:model="fechainicio" wire:change="CambiarFechaInicio()">
-                        @error('fechainicio') <span>{{ $message }}</span>@enderror
+                        @error('fechainicio') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Cuotas</label>
                         </div>
                         <input type="number" class="form-control" wire:model="cuotas" disabled>
-                        @error('cuotas') <span>{{ $message }}</span>@enderror
+                        @error('cuotas') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Fin</label>
                         </div>
                         <input type="date" class="form-control" wire:model="fechafin" disabled>
-                        @error('fechafin') <span>{{ $message }}</span>@enderror
+                        @error('fechafin') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12">
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Observaciones</label>
                         </div>
                         <input type="text" class="form-control" wire:model="periodos_observaciones">
-                        @error('periodos_observaciones') <span>{{ $message }}</span>@enderror
+                        @error('periodos_observaciones') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -93,7 +96,7 @@
                             <option value="2">No administra</option>
                             <option value="0">No especifica / otro</option>
                         </select>
-                        @error('administra_alquiler_id') <span>{{ $message }}</span>@enderror
+                        @error('administra_alquiler_id') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <label type="button" class="btn btn-info">F. de pago Inq.</label>
@@ -103,14 +106,14 @@
                             <option value="3">Transf. a Propietario</option>
                             <option value="0">No especifica / otro</option>
                         </select>
-                        @error('lugar_pago_inquilino') <span>{{ $message }}</span>@enderror
+                        @error('lugar_pago_inquilino') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <label type="button" class="btn btn-info">Cartera</label>
                         <select class="form-control" wire:model="detalles_cartera">
                             <option value="0">No especifica / otro</option>
                         </select>
-                        @error('detalles_cartera') <span>{{ $message }}</span>@enderror
+                        @error('detalles_cartera') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                 </div>
             </div>
@@ -134,7 +137,7 @@
                             <input type="checkbox" class="mr-3 col-1" wire:modal="incluir_mora_graficos">Incluir moras de este contrato en gráficos y listados
                         </div>
                     </div>
-                    @error('estado') <span>{{ $message }}</span>@enderror
+                    @error('estado') <span class="text-red-500">{{ $message }}</span>@enderror
                 </div>
             </div>
 
@@ -148,7 +151,7 @@
                         <option value="2">Usar config. particular para este contr.</option>
                         <option value="3">No cobrar punitorios en este contrato</option>
                     </select> 
-                    @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
+                    @error('intereses_punitorios_id') <span class="text-red-500">{{ $message }}</span>@enderror
                 </div>
             {{-- </div> --}}
 
@@ -168,31 +171,31 @@
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <label type="button" class="btn btn-info">Porcentaje diario</label>
                                 <input class="form-control" type="number" wire:model="c_general_por_diario">
-                                @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
+                                @error('c_general_por_diario') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <label type="button" class="btn btn-info">Día Inicio cálculo</label>
                                 <input class="form-control" type="number" wire:model="c_general_dia_inicio">
-                                @error('intereses_punitorios_id') <span>{{ $message }}</span>@enderror
+                                @error('c_general_dia_inicio') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <label type="button" class="btn btn-info">Días de gracia</label>
                                 <input class="form-control" type="number" wire:model="c_general_dias_gracia">
-                                @error('c_general_dias_gracia') <span>{{ $message }}</span>@enderror
+                                @error('c_general_dias_gracia') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <label type="button" class="btn btn-info">Porcentaje</label>
                                 <input class="form-control" type="number" wire:model="c_general_porcentaje">
-                                @error('c_general_porcentaje') <span>{{ $message }}</span>@enderror
+                                @error('c_general_porcentaje') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>                        
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <input type="checkbox" class="mr-1 col-1" wire:model="reintegrar_punitorios">Reintegrar punitorios al Propietario
-                                @error('reintegrar_punitorios') <span>{{ $message }}</span>@enderror
+                                @error('reintegrar_punitorios') <span class="text-red-500">{{ $message }}</span>@enderror
 
                             </div>
                             <div class="input-group mb-3 col-12 col-sm-6">
                                 <input type="checkbox" class="mr-1 col-1" wire:model="cobrar_administrativos_punitorios">Cobrar admininstrativos sobre punitorios
-                                @error('cobrar_administrativos_punitorios') <span>{{ $message }}</span>@enderror
+                                @error('cobrar_administrativos_punitorios') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                         </div>
                         <div class="card-body flex-wrap">
@@ -210,12 +213,18 @@
                         <table class="table table-striped col-12">
                             <tr class="w-1/4">
                                 <td>Propietario</td>
-                                <td><input type="text" class="form-control" wire:model="propietario_text"></td>
+                                <td>
+                                    <input type="text" class="form-control" wire:model="propietario_text">
+                                    @error('propietario_id') <span class="text-red-500">{{ $message }}</span>@enderror
+                                </td>
                                 <td><input type="button" value="Buscar" class="form-control btn-primary" wire:click="CargarListado('Propietarios')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
                             </tr>
                             <tr>
                                 <td>Inquilino</td>
-                                <td><input type="text" class="form-control" wire:model="inquilino_text"></td>
+                                <td>
+                                    <input type="text" class="form-control" wire:model="inquilino_text">
+                                    @error('inquilino_id') <span class="text-red-500">{{ $message }}</span>@enderror
+                                </td>
                                 <td><input type="button" value="Buscar" class="form-control btn-primary" wire:click="CargarListado('Inquilinos')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
                             </tr>
                             <tr class="w-1/4">
@@ -233,6 +242,7 @@
                                             </div>
                                         @endforeach
                                     @endif
+                                    @error('garantes') <span class="text-red-500">{{ $message }}</span>@enderror
                                 </td>
                                 <td><input type="button" value="Buscar" class="form-control btn-primary" wire:click="CargarListado('Garantes')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
                             </tr>
@@ -255,13 +265,12 @@
                             <option value="">Selecciona una moneda</option>
                             @foreach ($monedas as $moneda)
                                 <option value="{{ $moneda->id }}">{{ $moneda->signo}} - {{ $moneda->monedadescripcion}}</option>
-                                
                             @endforeach
                             <option value="0">Otro</option>
                         </select>
-                        @error('moneda_id') <span>{{ $message }}</span>@enderror
-
                     </div>
+                    @error('moneda_id') <span class="text-red-500">{{ $message }}</span>@enderror
+
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Actualización</label>
@@ -272,10 +281,10 @@
                                 <option value="{{ $actualizacion->id }}">{{ $actualizacion->cantmeses}} - {{ $actualizacion->actualizaciondescripcion}}</option>
                             @endforeach
                             <option value="0">Otro</option>
-                        </select>
-                        @error('actualizacion_id') <span>{{ $message }}</span>@enderror
-
+                        </select>  
                     </div>
+                    @error('actualizacion_id') <span class="text-red-500">{{ $message }}</span>@enderror
+
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Tipo Ajuste</label>
@@ -287,8 +296,9 @@
                             @endforeach
                             <option value="0">Otro</option>
                         </select>
-                        @error('ajuste_id') <span>{{ $message }}</span>@enderror
                     </div>
+                    @error('ajuste_id') <span class="text-red-500">{{ $message }}</span>@enderror
+
                     <table class="col-12 table table-striped">
                         <tr>
                             <td style="text-align: center;"><b>Desde</b></td>
@@ -297,6 +307,8 @@
                         </tr>
                             {!! $html !!}                        
                     </table>
+                    
+                    <input type="button" class="btn btn-info" value="Fijar Valores" wire:click="CambiarValores()">
                 </div>
             </div>
 
@@ -319,23 +331,21 @@
                             <option value="1">Porcentual del alquiler</option>
                             <option value="2">Monto en pesos</option>
                         </select>
-                        @error('gastos_administrativos_id') <span>{{ $message }}</span>@enderror
-
                     </div>
-                {{-- </div>
-                <div class="card-body d-flex flex-wrap"> --}}
+                    @error('gastos_administrativos_id') <span class="text-red-500">{{ $message }}</span>@enderror
+
                     <div class="input-group mt-3 col-6" @disabled(true)>
                         <label  type="button" class="btn btn-info col-6">Porcentaje</label>
-                        <input type="text" class="form-control" @if($gastos_administrativos_id==2) disabled @endif wire:model="porcentaje_administrativos">
-                        @error('porcentaje_administrativos') <span>{{ $message }}</span>@enderror
-
+                        <input type="text" class="form-control" @if($gastos_administrativos_id==2) disabled @endif wire:model="porcentaje_administrativos">                        
                     </div>
+                    @error('porcentaje_administrativos') <span class="text-red-500">{{ $message }}</span>@enderror
+
                     <div class="input-group mt-3 col-6">
                         <label  type="button" class="btn btn-info col-6">Monto</label>
-                        <input type="text" class="form-control" @if($gastos_administrativos_id==1) disabled @endif wire:model="valor_administrativos">
-                        @error('valor_administrativos') <span>{{ $message }}</span>@enderror
-
+                        <input type="text" class="form-control" @if($gastos_administrativos_id==1) disabled @endif wire:model="valor_administrativos">    
                     </div>
+                    @error('valor_administrativos') <span class="text-red-500">{{ $message }}</span>@enderror
+
                 </div>
             </div>
 
@@ -345,26 +355,27 @@
                 <div class="card-body d-flex flex-wrap">
                     <div class="input-group mb-3 col-12 col-sm-6">
                         <label type="button" class="btn btn-info">Estado</label>
-                        <select class="form-control" wire:model="seguro_id">
+                        <select class="form-control" wire:model="seguro_id" wire:change="CambiarSeguro()">
                             <option value="1">Trámite completo</option>
                             <option value="2">Trámite incompleto</option>
                             <option value="3">No corresponde / Otro</option>
                         </select>
-                        @error('seguro_id') <span>{{ $message }}</span>@enderror
-
                     </div>
-                    <div class="input-group mb-3 col-12 col-sm-6">
-                        <label  type="button" class="btn btn-info">Vencimiento:</label>
-                        <input type="date" class="form-control" wire:model="vencimiento">
-                        @error('vencimiento') <span>{{ $message }}</span>@enderror
+                    @error('seguro_id') <span class="text-red-500">{{ $message }}</span>@enderror
 
-                    </div>
-                    <div class="input-group mb-3 col-12">
-                        <label type="button" class="btn btn-info">Observaciones del seguro</label>
-                        <textarea class="form-control" cols="60">{{ $seguro_observaciones}}</textarea>
-                        @error('seguro_observaciones') <span>{{ $message }}</span>@enderror
+                    @if($seguro_id<>3)
+                        <div class="input-group mb-3 col-12 col-sm-6">
+                            <label  type="button" class="btn btn-info">Vencimiento:</label>
+                            <input type="date" class="form-control" wire:model="vencimiento">
+                        </div>
+                        @error('vencimiento') <span class="text-red-500">{{ $message }}</span>@enderror
 
-                    </div>
+                        <div class="input-group mb-3 col-12">
+                            <label type="button" class="btn btn-info">Observaciones del seguro</label>
+                            <textarea class="form-control" cols="60">{{ $seguro_observaciones}}</textarea>
+                        </div>
+                        @error('seguro_observaciones') <span class="text-red-500">{{ $message }}</span>@enderror
+                    @endif
                 </div>
             </div>
 

@@ -81,6 +81,13 @@
                     </button>
                 </div>
                 <div class="px-3 py-3">
+                    @if(Session::has('mensaje'))
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
+                            {{Session::get('mensaje')}}
+                        </div>  
+                    @endif
                     <div  wire:ignore.self class="col-12 d-flex">
                         <div class="col-3 m-2 p-2 rounded-md"style="background-color: lightgray;border-radius: 5px;">
                             <img src="" alt="" width="100px" height="100px">

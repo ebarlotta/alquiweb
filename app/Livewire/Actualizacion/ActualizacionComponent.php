@@ -13,7 +13,7 @@ class ActualizacionComponent extends Component
 
     public function render()
     {
-        $this->actualizaciones = Actualizaciones::all();
+        $this->actualizaciones = Actualizaciones::orderby('cantmeses')->get();
         return view('livewire.actualizacion.actualizacion-component')->extends('adminlte::page');
     }
     

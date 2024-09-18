@@ -137,6 +137,10 @@
 
         <div class="container-fluid">
 
+            <div class="row mr-1" style="justify-content: end;">
+                <a href="login" class="btn btn-info h-2 m-2">Login</a>
+                <a href="register" class="btn btn-info h-2 m-2">Register</a>
+            </div>
             <div class="row">
                 <div class="col-lg-3 col-6">
 
@@ -203,9 +207,9 @@
 
             {{-- <div class="row"> --}}
 
-                <section class="col-lg-5 connectedSortable ui-sortable d-flex col-12">
+                <section class="connectedSortable ui-sortable d-flex col-12">
 
-                    <div class="card bg-gradient-primary  col-6">
+                    <div class="card bg-gradient-primary mr-2" style="width: 95%">
                         <div class="card-header border-0 ui-sortable-handle" style="cursor: move;">
                             <h3 class="card-title">
                                 <i class="fas fa-map-marker-alt mr-1"></i>
@@ -510,7 +514,7 @@
                         </div>
                     </div>
 
-                    <div class="card bg-gradient-success col-6">
+                    <div class="card bg-gradient-success ml-2" style="width: 95%">
                         <div class="card-header border-0 ui-sortable-handle" style="cursor: move;">
                             <h3 class="card-title">
                                 <i class="far fa-calendar-alt"></i>

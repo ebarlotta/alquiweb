@@ -37,11 +37,11 @@
                 <div class="px-3 py-3">
                     
                     <div class="input-group-prepend col-12">
-                        <button type="button" class="btn btn-info col-6">Nombre de la actualización</button>
+                        <button type="button" class="btn btn-info col-6" disabled>Nombre de la actualización</button>
                         <input type="text" class="form-control col-6" wire:model="actualizaciondescripcion">
                     </div>
                     <div class="input-group-prepend col-12">
-                        <button type="button" class="btn btn-info col-6">Cantidad de meses</button>
+                        <button type="button" class="btn btn-info col-6" disabled>Cantidad de meses</button>
                         <input type="text" class="form-control col-6" wire:model="cantmeses">
                     </div>
 

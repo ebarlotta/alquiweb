@@ -44,12 +44,12 @@
                 <div class="px-3 py-3">
                     
                     <div class="input-group-prepend col-12">
-                        <button type="button" class="btn btn-info col-6">Nombre de la moneda</button>
+                        <button type="button" class="btn btn-info col-6" disabled>Nombre de la moneda</button>
                         <input type="text" class="form-control col-6" wire:model="monedadescripcion">
                     </div>
                     
                     <div class="input-group-prepend col-12 mt-2">
-                        <button type="button" class="btn btn-info col-6">Signo de la moneda</button>
+                        <button type="button" class="btn btn-info col-6" disabled>Signo de la moneda</button>
                         <input type="text" class="form-control col-6" wire:model="signo">
                     </div>
                     
