@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use LDAP\Result;
 
 class alqui_contrato extends Model
 {
@@ -43,6 +44,7 @@ class alqui_contrato extends Model
         'seguro_observaciones',
         'bien_id',
         'valores',
+        'activo',
     ];
 
     public function inquilino() {
@@ -70,5 +72,36 @@ class alqui_contrato extends Model
             $resul = $b->razonsocial;
         }
         return $resul;
+    }
+
+    public function garantes($id) {
+        $pf = alqui_rel_contrato_garante::join('persona_fisicas','persona_fisicas.id','alqui_rel_contrato_garantes.garante_id')
+        ->where('contrato_id','=',$id)
+        ->where('persona_type','=','fisica')
+        ->where('alqui_rel_contrato_garantes.activo','=',true)
+        ->get();
+        $pj = alqui_rel_contrato_garante::join('persona_juridicas','persona_juridicas.id','alqui_rel_contrato_garantes.garante_id')
+        ->where('contrato_id','=',$id)
+        ->where('persona_type','=','juridica')
+        ->where('alqui_rel_contrato_garantes.activo','=',true)
+        ->get();
+        // $a = alqui_rel_contrato_garante::where('contrato_id','=',$id)->get();
+        // dd($a);
+        $html = "<table>";
+        if(count($pf)) {
+            foreach($pf as $garante) {
+                $html = $html . "<tr><td><label style=\"border-radius: 10px;background-color: lightblue;padding: 2px 10px 2px 10px;\">".$garante->apellidos.', '. $garante->nombres . "<label></td></tr>";
+            }
+        }
+        if(count($pj)) {
+            foreach($pj as $garante) {
+                $html = $html . "<tr><td><label style=\"border-radius: 10px;background-color: lightblue;padding: 2px 10px 2px 10px;\">".$garante->razonsocial . "<label></td></tr>";
+            }
+        }
+        $html = $html . "</table>";
+        
+        // if($id == 14 ) dd($html);
+        // dd($html);
+        return $html;
     }
 }

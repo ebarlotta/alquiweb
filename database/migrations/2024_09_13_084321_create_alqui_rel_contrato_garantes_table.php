@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('contrato_id');
             $table->unsignedBigInteger('garante_id');
+            $table->string('persona_type');
             $table->boolean('activo');
 
             $table->timestamps();
 
-            $table->foreign('contrato_id')->references('id')->on('alqui_contratos');
-            $table->foreign('garante_id')->references('id')->on('alqui_garantes');
+            // $table->foreign('contrato_id')->references('id')->on('alqui_contratos');
+            // $table->foreign('garante_id')->references('id')->on('alqui_garantes');
         });
     }
 

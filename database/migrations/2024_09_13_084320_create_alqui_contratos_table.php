@@ -53,7 +53,7 @@ return new class extends Migration
 
             $table->boolean('liquidacion_fraccionada')->default(0);
             $table->string('valores')->default(0);
-            
+            $table->string('activo')->default(true);
 
             $table->timestamps();
 

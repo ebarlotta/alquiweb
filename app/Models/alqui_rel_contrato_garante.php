@@ -12,6 +12,7 @@ class alqui_rel_contrato_garante extends Model
     protected $fillable=[
         'contrato_id',
         'garante_id',
+        'persona_type',
         'activo',
     ];
 }

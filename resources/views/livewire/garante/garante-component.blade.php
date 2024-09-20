@@ -125,6 +125,7 @@
                                     </div>
                                     <input type="text" class="form-control" wire:model="cuil">
                                 </div>
+                                @error('cuil') <span class="text-red-500">{{ $message }}</span>@enderror
                             @else
                                 <div class="input-group mb-3 col-6">
                                     <div class="input-group-prepend">
@@ -132,6 +133,7 @@
                                     </div>
                                     <input type="text" class="form-control" wire:model="cuit">
                                 </div>
+                                @error('cuit') <span class="text-red-500">{{ $message }}</span>@enderror
                             @endif
                             @if($persona_type=='fisica')
                                 <div class="input-group mb-3 col-6">
@@ -139,18 +141,21 @@
                                         <label type="button" class="btn btn-info">Apellidos</label>
                                     </div>
                                     <input type="text" class="form-control" wire:model="apellidos">
+                                    @error('apellidos') <span class="text-red-500">{{ $message }}</span>@enderror
                                 </div>
                                 <div class="input-group mb-3 col-6">
                                     <div class="input-group-prepend">
                                         <label type="button" class="btn btn-info">Nombre(s)</label>
                                     </div>
                                     <input type="text" class="form-control" wire:model="nombres">
+                                    @error('nombres') <span class="text-red-500">{{ $message }}</span>@enderror
                                 </div>
                                 <div class="input-group mb-3 col-6">
                                     <div class="input-group-prepend">
                                         <label type="button" class="btn btn-info">DNI</label>
                                     </div>
                                     <input type="text" class="form-control" wire:model="dni">
+                                    @error('dni') <span class="text-red-500">{{ $message }}</span>@enderror
                                 </div>
                             @else
                                 <div class="input-group mb-3 col-12">
@@ -158,6 +163,7 @@
                                         <label type="button" class="btn btn-info">Razón Social</label>
                                     </div>
                                     <input type="text" class="form-control" wire:model="razonsocial">
+                                    @error('razonsocial') <span class="text-red-500">{{ $message }}</span>@enderror
                                 </div>
                             @endif
                             
@@ -166,18 +172,21 @@
                                     <label type="button" class="btn btn-info" @disabled(true)>Teléfono</label>
                                 </div>
                                 <input type="text" class="form-control" wire:model="telefono">
+                                @error('telefono') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
                                     <label type="button" class="btn btn-info">Whatsapp</label>
                                 </div>
                                 <input type="text" class="form-control" wire:model="whatsapp">
+                                @error('whatsapp') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
                                     <label type="button" class="btn btn-info">Emails</label>
                                 </div>
                                 <input type="text" class="form-control" wire:model="email_id">
+                                @error('email_id') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
@@ -189,6 +198,7 @@
                                         <option value="{{ $iva->id }}">{{ $iva->ivadescripcion}}</option>
                                     @endforeach
                                 </select>
+                                @error('iva_id') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             @if($persona_type=='fisica')
                                 <div class="input-group mb-3 col-6">
@@ -197,6 +207,7 @@
                                     </div>
                                     <input type="date" class="form-control" wire:model="fechanacimiento">
                                 </div>
+                                @error('fechanacimiento') <span class="text-red-500">{{ $message }}</span>@enderror
                             @else
                                 <div class="input-group mb-3 col-6">
                                     <div class="input-group-prepend">
@@ -204,12 +215,14 @@
                                     </div>
                                     <input type="date" class="form-control" wire:model="fechainicioact">
                                 </div>
+                                @error('fechainicioact') <span class="text-red-500">{{ $message }}</span>@enderror
                             @endif
                             <div class="input-group mb-3 col-xl-6">
                                 <div class="input-group-prepend">
                                     <label type="button" class="btn btn-info">Domicilio</label>
                                 </div>
                                 <input type="text" class="form-control" wire:model="calle">
+                                @error('calle') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
@@ -221,6 +234,7 @@
                                         <option value="{{ $provincia->id }}">{{ $provincia->provinciadescripcion}}</option>
                                     @endforeach
                                 </select>
+                                @error('provincia_id') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
@@ -232,19 +246,20 @@
                                         <option value="{{ $localidad->id }}">{{ $localidad->localidaddescripcion}}</option>
                                     @endforeach
                                 </select>
+                                @error('localidad_id') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group-prepend">
                                     <label type="button" class="btn btn-info">Observaciones</label>
                                 </div>
                                 <input type="text" class="form-control" wire:model="observaciones">
+                                @error('observaciones') <span class="text-red-500">{{ $message }}</span>@enderror
                             </div>
                             <div class="input-group mb-3 col-6">
                                 <div class="input-group mx-auto">
                                     <input type="button" class="form-control btn-success mx-3 col-12" value="Guardar" wire:click="store()">
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 

@@ -120,20 +120,27 @@
 
             {{-- Estados --}}
             <div class="card">
-                <div class="encabezado_card">Estado</div>
+                <div class="encabezado_card" style="margin-bottom: -6px;">Estado</div>
                 <div class="card-body flex-wrap text-center">
-                    <div class="col-2 mb-2 rounded-md text-center" style="background-color: lightseagreen">
-                        <b>&nbsp;ACTIVO</b>
+                    <div style="align-content: center;justify-content: center; margin-bottom: 10px;" class="flex">
+                        @if($estado)
+                            <div class="col-2 mb-2 rounded-md text-center" style="background-color: lightseagreen">                        
+                                <b>&nbsp;ACTIVO</b>
+                            </div>
+                        @else
+                            <div class="col-2 mb-2 rounded-md text-center" style="background-color: lightcoral">                        
+                                <b>&nbsp;NO ACTIVO</b>
+                            </div>
+                        @endif
                     </div>
                     <div>
-                        <div class="text-center">
+                        <div class="text-center" style="margin-bottom: 15px;">
                             <button class="btn btn-primary">Rescindir contrato</button>
                             <button class="btn btn-primary">Renovar contrato</button>
-                            <button class="btn btn-primary">Cambio de inquilino</button>
-                            <button class="btn btn-primary">Eliminar contrato</button>
+                            @if($contrato_id)<button class="btn btn-primary" wire:click="AbrirModalCambioInquilino()">Cambio de inquilino</button>@endif
                         </div>
                         <hr>
-                        <div class="d-flex text-left">
+                        <div class="d-flex text-left mt-2">
                             <input type="checkbox" class="mr-3 col-1" wire:modal="incluir_mora_graficos">Incluir moras de este contrato en gráficos y listados
                         </div>
                     </div>
@@ -231,12 +238,16 @@
                                 <td>Garantes</td>
                                 <td>
                                     @if($garantes)
+                                    {{-- {!!$garantes!!} --}}
                                         @foreach($garantes as $garante)                                        
                                             <div class="input-group">
                                                 <div class="input-group-prepend">
-                                                    <span class="input-group-text">
-                                                        <input type="checkbox" value="{{ $garante[1] }}" wire:click="EliminarGarante({{ $garante[1] }})">
-                                                    </span>
+                                                    @if($contrato_id)
+                                                    @else
+                                                        <span class="input-group-text">
+                                                            <input type="checkbox" value="{{ $garante[1] }}" wire:click="EliminarGarante({{ $garante[1] }})">
+                                                        </span>
+                                                    @endif
                                                 </div>
                                                 <input type="text" class="form-control" value="{{ $garante[0] }}">
                                             </div>
@@ -303,11 +314,15 @@
                         <tr>
                             <td style="text-align: center;"><b>Desde</b></td>
                             <td style="text-align: center;"><b>Hasta</b></td>
-                            <td style="text-align: center;"><b>Valor</b></td>
+                            <td style="text-align: center;"><b>Rango de Valores</b></td>
                         </tr>
                             {!! $html !!}                        
                     </table>
-                    
+                    <div class="input-group mb-3 col-12 col-sm-6">
+                        <div class="input-group-prepend">
+                            <input type="checkbox" class="btn btn-info" value="Liquidación Fraccionada" wire:model="liquidacion_fraccionada">Liquidación Fraccionada
+                        </div>
+                    </div>
                     <input type="button" class="btn btn-info" value="Fijar Valores" wire:click="CambiarValores()">
                 </div>
             </div>
@@ -425,6 +440,8 @@
             
         </div>
 
+        <input class="btn btn-info" type="button" value="Ver Garantes" wire:click="VerGarantes()">
+
         <div class="col-12">
             <input class="btn btn-success col-12" type="button" value="Guardar" wire:click="store()">
         </div>
@@ -483,8 +500,118 @@
         </div>
     </div>
 
+    <!-- Modal Se guardo correctamente el contrato -->
+    <!-- ========================================== -->
 
-    </div>
+    @if($mostratModalOk)
+        <div class="flex items-end justify-center mt-24 pt-4 px-4 pb-20 text-center sm:block sm:p-0" style="background-color: beige; ">
+            <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
+                <div class="fixed inset-0 transition-opacity">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" style="width: inherit">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Alta Exitosa</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="px-3 py-3">
+                            El contrato ha sido guardado correctamente!
+                            <div class="pt-3">
+                                <button type="button" class="btn btn-info" wire:click="CerrarModalOk()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Cambio de Inquilino -->
+    <!-- ========================= -->
+
+    @if($modalCambioInquilino)    
+        <div class="flex items-end justify-center mt-24 pt-4 px-4 pb-20 text-center sm:block sm:p-0" style="background-color: beige; ">
+            <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
+                <div class="fixed inset-0 transition-opacity">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                <div class="modal-dialog mt-20" role="document">
+                    <div class="modal-content" style="width: inherit">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Cambio de Inquilino</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="px-3 py-3">
+                            <div class="switch_div">
+                                <label class="switch">
+                                    <input type="checkbox" checked="" id="switchEliminarImpagos">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="textoSwitch">Eliminar conceptos impagos de este contrato (...)</span>
+                            </div>
+
+                            <div class="dropdown mb-2">
+                                Eliminar impagos de
+                                <select name="" id="">
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                </select>
+                                y posteriores
+                            </div>
+                            <table class="table table-striped col-12">
+                                <tr>
+                                    <td>Inquilino</td>
+                                    <td>
+                                        <select class="form-control" wire:model="inquilino_id">
+                                            <option selected>Seleccione un inquilino</option>
+                                            @if($listado_fisicas)
+                                                @foreach ($listado_fisicas as $inquilino)
+                                                    <option value="{{ $inquilino->id }}">{{ $inquilino->apellidos }}, {{ $inquilino->nombres }}</option>
+                                                @endforeach
+                                            @endif
+                                            @if($listado_juridicas)
+                                                @foreach ($listado_juridicas as $inquilino1)
+                                                    <option value="{{ $inquilino1->id }}">{{ $inquilino1->razonsocial }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                        {{-- <input type="text" class="form-control" wire:model="inquilino_text"> --}}
+                                        @error('inquilino_id') <span class="text-red-500">{{ $message }}</span>@enderror
+                                    </td>
+                                    <td><input type="button" value="Buscar" class="form-control btn-primary" wire:click="CargarListado('Inquilinos')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
+                                </tr>
+                            </table>
+                            <p class="text-left ml-3">
+                                Se realizarán los siguientes cambios:<br><br>
+                                · Se marcará este contrato como inactivo<br>
+                                · Se eliminarán los conceptos impagos (si elegiste esa opción)<br>
+                                · Se creará un nuevo contrato con el mismo propietario e inmueble<br>
+                                · Se creará un nuevo inquilino y se asignará al nuevo contrato 
+                            </p>
+                            <div class="pt-3">
+                                <button type="button" class="btn btn-danger" wire:click="CambiarInquilino()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Hacer Cambio
+                                </button>
+                                <button type="button" class="btn btn-info" wire:click="CerrarModalCambioInquilino()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+</div>
 
 
 
