@@ -40,14 +40,11 @@ class ContratoComponent extends Component
     public $garantes, $garantes_ids, $numero;
     public $valor = [60];
     public $updateTypes = [];
-    public $mostratModalOk=false, $modalCambioInquilino=false;
+    public $mostratModalOk=false, $modalCambioInquilino=false, $modalRescindirContrato=false, $modalRenovarContrato=false, $NuevaFechaInicioContrato, $modalGestionarConceptos;
 
     public function mount() { $this->fechainicio = date_create()->format('Y-m-d'); }
 
-    public function render()
-    {
-
-        // $this->valor = array_fill(0, 60, null);
+    public function render() {
         
         $this->bien_id = 1;
 
@@ -69,6 +66,57 @@ class ContratoComponent extends Component
     public function CambiarFechaInicio() { $this->fechafin = date("Y-m-d", strtotime($this->fechainicio . "+ ".$this->duracion." year -1 day")); }
     public function CambiarIntereses() { $this->intereses_punitorios_id = $this->intereses_punitorios_id; }
     public function CerrarModalOk() { $this->mostratModalOk = false; return redirect()->route('principal'); }
+
+    public function CerrarModalRenovarContrato() { $this->modalRenovarContrato = false; }
+    public function AbrirModalRenovarContrato() { $this->modalRenovarContrato = true; }
+    public function RenovarContrato() {
+        
+        $this->validate([
+            'NuevaFechaInicioContrato'=>'required',
+        ]);
+
+        // Desactiva Contrato
+        alqui_contrato::where('id', $this->contrato_id)->update(['activo' => false,]);
+
+        // Elimina conceptos impagos si es que está marcada la opcion
+        // CODIGO
+        
+        // Se crea un nuevo contrato con el mismo propietario, inmueble e inquilino
+        $contrato = alqui_contrato::find( $this->contrato_id);
+        $newContrato = $contrato->replicate();
+
+        // Se le asigna la nueva fecha de inicio del contrato
+        $newContrato->fechainicio=$this->NuevaFechaInicioContrato;
+        $newContrato->activo = true;
+        $newContrato->save();
+
+        // Se relacionan los garantes
+        $garantes = alqui_rel_contrato_garante::where('contrato_id','=',$this->contrato_id)->get();
+        foreach($garantes as $garante) {
+            $newgarante = $garante->replicate();
+            $newgarante->contrato_id = $newContrato->id;
+            $newgarante->save();
+        }
+
+
+        $this->CerrarModalRenovarContrato();
+        $this->contrato_id = null; session(['contrato_id'=>null]);
+        session()->flash('mensaje', 'Se Renovó el contrato.');
+    }
+
+    public function CerrarModalRescindirContrato() { $this->modalRescindirContrato = false; }
+    public function AbrirModalRescindirContrato() { $this->modalRescindirContrato = true; }
+    public function RescindirContrato() {
+        
+        // Desactiva Contrato
+        alqui_contrato::where('id', $this->contrato_id)->update(['activo' => false,]);
+
+        // Elimina conceptos impagos si es que está marcada la opcion
+        // CODIGO
+        $this->CerrarModalRescindirContrato();
+        session()->flash('mensaje', 'Se Rescindió el contrato.');
+    }
+
     public function CerrarModalCambioInquilino() { $this->modalCambioInquilino = false; }
     public function AbrirModalCambioInquilino() { $this->CargarListado('Inquilinos'); $this->modalCambioInquilino = true; }
     public function CambiarInquilino() {
@@ -77,8 +125,6 @@ class ContratoComponent extends Component
             'inquilino_id'=>'required',
         ]);
         // Desactiva Contrato
-        
-        // dd($this->listado_fisicas );
         alqui_contrato::where('id', $this->contrato_id)->update(['activo' => false,]);
 
         // Elimina conceptos impagos si es que está marcada la opcion
@@ -92,10 +138,17 @@ class ContratoComponent extends Component
         $newContrato->activo = true;
         $newContrato->save();
 
-dd($newContrato);
-        dd(($this->inquilino_id.'-'.$this->inquilino_text.'-'.$this->contrato_id));
+        session()->flash('mensaje', 'Se actualizó el inquilino.');
+
+        // dd($newContrato);
+        // dd(($this->inquilino_id.'-'.$this->inquilino_text.'-'.$this->contrato_id));
     }
     
+    public function CerrarModalGestionarConceptos() { $this->modalGestionarConceptos = false; }
+    public function AbrirModalGestionarConceptos() { $this->modalGestionarConceptos = true; }
+
+
+
     public function CambiarValores() { 
         // $this->updateTypes(count($this->updateTypes));
         // $a= count($this->updateTypes);

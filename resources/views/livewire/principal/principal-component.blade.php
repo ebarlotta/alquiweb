@@ -7,15 +7,26 @@
         </div>  
     @endif
     <div class="card card-info offset-md-1 col-10 text-center">
-        {{-- <div class="card-header"> --}}
-            {{-- <h3 class="card-title">Listado de Contratos</h3> --}}
-            <div class="d-flex mt-3" style="justify-content: center;">
+
+        <div class="d-flex justify-content-around">
+            <div class="d-flex mt-3 align-items-center" style="justify-content: center;">
                 <h1>Listado de Contratos</h1>
-                {{-- <a href="contratos"> --}}
-                    <input type="button" class="btn btn-success col-1 ml-2" style="height:30px; width: 100px;" value="+" wire:click="NuevoContrato()">
-                {{-- </a> --}}
+                <input type="button" class="btn btn-success col-1 ml-2" style="height:30px; width: 100px; padding-top: 2px;" value="+" wire:click="NuevoContrato()">
             </div>
-        {{-- </div> --}}
+            <div class="d-flex align-items-center">
+                <div><input class="mr-1" type="radio" name="todos" value="0" wire:click="CambiarVista(0)" checked>Todos</div>
+                <div class="ml-4"><input class="mr-1" type="radio" name="todos" value="1" wire:click="CambiarVista(1)">Sólo activos</div>
+            </div>
+            <div class="d-flex align-items-center">
+                <input class="form-control" type="text" wire:modal="search" wire:keyup="CambiarVista()">
+            </div>
+            <div class="d-flex align-items-center">
+                {{ $contratos->links() }}
+                {{-- {!! $contratos->appends(Request::all())->links() !!} --}}
+                {{-- {!! $contratos->render() !!} --}}
+            </div>
+        </div>
+<div>
 
         <div class="card-body">
             <table class="table table-striped">
@@ -29,19 +40,34 @@
                 <td>Opciones</td>
             </tr>
             @foreach ($contratos as $contrato)
-                <tr>
-                    <td>{{ $contrato->id }}</td>
-                    <td>{{  substr($contrato->fechainicio,8,2).'-'.substr($contrato->fechainicio,5,2).'-'.substr($contrato->fechainicio,0,4) }}</td>
-                    <td>{{  substr($contrato->fechafin,8,2).'-'.substr($contrato->fechafin,5,2).'-'.substr($contrato->fechafin,0,4) }}</td>
-                    <td>{{ $contrato->inquilino() }}</td>
-                    <td>{{ $contrato->propietario() }}</td>
-                    <td>{!! $contrato->garantes($contrato->id) !!}</td>
-                    <td>
-                        <label style="border-radius: 10px;background-color: lightcoral ;padding: 2px 10px 2px 10px;" wire:click="modalEliminarContrato({{ $contrato->id }})">Eliminar</label>
-                        <label style="border-radius: 10px;background-color: lightgreen ;padding: 2px 10px 2px 10px;" wire:click="CargarIdContrato({{ $contrato->id }})">Modificar</label>
-                    </td>
-                </tr>
-                @endforeach
+                {{-- @if(!$contrato->activo) --}}
+                    <tr @if(!$contrato->activo) style="color: burlywood;" @endif>
+                        <td>{{ $contrato->id }}</td>
+                        <td>{{  substr($contrato->fechainicio,8,2).'-'.substr($contrato->fechainicio,5,2).'-'.substr($contrato->fechainicio,0,4) }}</td>
+                        <td>{{  substr($contrato->fechafin,8,2).'-'.substr($contrato->fechafin,5,2).'-'.substr($contrato->fechafin,0,4) }}</td>
+                        <td>{{ $contrato->inquilino() }}</td>
+                        <td>{{ $contrato->propietario() }}</td>
+                        <td>{!! $contrato->garantes($contrato->id) !!}</td>
+                        <td>
+                            <label style="border-radius: 10px;background-color: lightcoral ;padding: 2px 10px 2px 10px;" wire:click="modalEliminarContrato({{ $contrato->id }})" @if(!$contrato->activo) @disabled(true) @endif>Eliminar</label>
+                            <label style="border-radius: 10px;background-color: lightgreen ;padding: 2px 10px 2px 10px;" wire:click="CargarIdContrato({{ $contrato->id }})" @if(!$contrato->activo) @disabled(true) @endif>Modificar</label>
+                        </td>
+                    </tr>
+                {{-- @else
+                    <tr>
+                        <td>{{ $contrato->id }}</td>
+                        <td>{{  substr($contrato->fechainicio,8,2).'-'.substr($contrato->fechainicio,5,2).'-'.substr($contrato->fechainicio,0,4) }}</td>
+                        <td>{{  substr($contrato->fechafin,8,2).'-'.substr($contrato->fechafin,5,2).'-'.substr($contrato->fechafin,0,4) }}</td>
+                        <td>{{ $contrato->inquilino() }}</td>
+                        <td>{{ $contrato->propietario() }}</td>
+                        <td>{!! $contrato->garantes($contrato->id) !!}</td>
+                        <td>
+                            <label style="border-radius: 10px;background-color: lightcoral ;padding: 2px 10px 2px 10px;" wire:click="modalEliminarContrato({{ $contrato->id }})">Eliminar</label>
+                            <label style="border-radius: 10px;background-color: lightgreen ;padding: 2px 10px 2px 10px;" wire:click="CargarIdContrato({{ $contrato->id }})">Modificar</label>
+                        </td>
+                    </tr>
+                @endif --}}
+            @endforeach
             </table>
         </div>
     </div>

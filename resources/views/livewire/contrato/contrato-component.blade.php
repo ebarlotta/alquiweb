@@ -7,6 +7,8 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
 
+    {{-- Mensaje --}}
+    {{-- ======= --}}
     @if(Session::has('mensaje'))
         <div class="alert alert-success alert-dismissible" role="alert">
             <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -14,6 +16,7 @@
             {{Session::get('mensaje')}}
         </div>  
     @endif
+
     <div class="col-12 d-flex flex-wrap">
         <div class="col-6 col-sm-6">
 
@@ -123,8 +126,8 @@
                 <div class="encabezado_card" style="margin-bottom: -6px;">Estado</div>
                 <div class="card-body flex-wrap text-center">
                     <div style="align-content: center;justify-content: center; margin-bottom: 10px;" class="flex">
-                        @if($estado)
-                            <div class="col-2 mb-2 rounded-md text-center" style="background-color: lightseagreen">                        
+                        @if($activo)
+                            <div class="col-2 mb-2 rounded-md text-center" style="background-color: greenyellow">                        
                                 <b>&nbsp;ACTIVO</b>
                             </div>
                         @else
@@ -135,8 +138,8 @@
                     </div>
                     <div>
                         <div class="text-center" style="margin-bottom: 15px;">
-                            <button class="btn btn-primary">Rescindir contrato</button>
-                            <button class="btn btn-primary">Renovar contrato</button>
+                            @if($contrato_id)<button class="btn btn-primary" wire:click="AbrirModalRescindirContrato()">Rescindir contrato</button>@endif
+                            @if($contrato_id)<button class="btn btn-primary" wire:click="AbrirModalRenovarContrato()">Renovar Contrato</button>@endif
                             @if($contrato_id)<button class="btn btn-primary" wire:click="AbrirModalCambioInquilino()">Cambio de inquilino</button>@endif
                         </div>
                         <hr>
@@ -331,7 +334,7 @@
             <div class="card">
                 <div class="encabezado_card">Herramientas</div>
                 <div class="card-body flex-wrap text-center">
-                    <button class="btn btn-primary">Agregar conceptos</button>
+                    <button class="btn btn-primary" wire:click="AbrirModalGestionarConceptos()">Agregar conceptos</button>
                     <button class="btn btn-primary">Eliminar contrato</button>
                 </div>
             </div>
@@ -611,6 +614,393 @@
             </div>
         </div>
     @endif
+
+        <!-- Modal Cambio de Inquilino -->
+    <!-- ========================= -->
+
+    @if($modalRescindirContrato)    
+        <div class="flex items-end justify-center mt-24 pt-4 px-4 pb-20 text-center sm:block sm:p-0" style="background-color: beige; ">
+            <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
+                <div class="fixed inset-0 transition-opacity">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                <div class="modal-dialog mt-20" role="document">
+                    <div class="modal-content" style="width: inherit">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Rescindir Contrato</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="px-3 py-3">
+                            <div class="switch_div">
+                                <label class="switch">
+                                    <input type="checkbox" checked="" id="switchEliminarImpagos">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="textoSwitch">Eliminar conceptos impagos de este contrato (...)</span>
+                            </div>
+
+                            <div class="dropdown mb-2">
+                                Eliminar impagos de
+                                <select name="" id="">
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                </select>
+                                y posteriores
+                            </div>
+                            <p class="text-left ml-3">
+                                Se realizarán los siguientes cambios:<br>
+                                · Se marcará este contrato como inactivo<br>
+                                · Se eliminarán los conceptos impagos (si elegiste esa opción)
+                            </p>
+                            <div class="pt-3">
+                                <button type="button" class="btn btn-danger" wire:click="RescindirContrato()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Rescindir Contrato
+                                </button>
+                                <button type="button" class="btn btn-info" wire:click="CerrarModalRescindirContrato()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Modal Renovar Contrato -->
+    <!-- ====================== -->
+
+    @if($modalRenovarContrato)    
+        <div class="flex items-end justify-center mt-24 pt-4 px-4 pb-20 text-center sm:block sm:p-0" style="background-color: beige; ">
+            <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
+                <div class="fixed inset-0 transition-opacity">
+                    <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+                </div>
+                <div class="modal-dialog mt-20" role="document">
+                    <div class="modal-content" style="width: inherit">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Renovar Contrato</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="px-3 py-3">
+                            <div class="switch_div">
+                                <label class="switch">
+                                    <input type="checkbox" checked="" id="switchEliminarImpagos">
+                                    <span class="slider round"></span>
+                                </label>
+                                <span class="textoSwitch">Eliminar conceptos impagos de este contrato (...)</span>
+                            </div>
+
+                            <div class="dropdown mb-2">
+                                Eliminar impagos de
+                                <select name="" id="">
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                    <option value=""></option>
+                                </select>
+                                y posteriores
+                            </div>
+                            <div>
+                                Nueva Fecha de Inicio de contrato
+                                <input type="date" wire:model="NuevaFechaInicioContrato">
+                            </div>
+                            @error('NuevaFechaInicioContrato') <span class="text-red-500">{{ $message }}</span>@enderror
+
+                            <p class="text-left ml-3">
+                                Se realizarán los siguientes cambios:<br>
+                                · Se marcará este contrato como inactivo<br>
+                                · Se eliminarán los conceptos impagos (si elegiste esa opción)<br>
+                                · Se creará un nuevo contrato con el mismo propietario, inquilino, inmueble, con nuevas fechas e independiente del actual<br>
+                            </p>
+                            <div class="pt-3">
+                                <button type="button" class="btn btn-danger" wire:click="RenovarContrato()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Renovar Contrato
+                                </button>
+                                <button type="button" class="btn btn-info" wire:click="CerrarModalRenovarContrato()" data-dismiss="modal" aria-label="Close">
+                                    <i class="fa-solid fa-pen-to-square"></i>Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
+
+    <!-- Modal Gestionar Conceptos -->
+    <!-- ========================= -->
+
+    @if($modalGestionarConceptos)
+    <div class="flex items-end justify-center mt-24 pt-4 px-4 pb-20 text-center sm:block sm:p-0" style="background-color: beige; ">
+        <div class="fixed z-10 inset-0 overflow-y-auto ease-out duration-400">
+            <div class="fixed inset-0 transition-opacity">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+
+            <div class="modal-dialog mt-20 d-flex text-center" role="document" style="max-width: 100%;margin-left: 16%;">
+                <div class="modal-content" style="width: 70rem;">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Gestionar Conceptos</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {{-- <div class="modal-body" id="modal_body"> --}}
+                    <div>
+                        <div class="d-flex"> <!--contiene ambos paneles-->
+                            <div id="agrConc_panelIzq" style="width: 50%">
+                                <div class="card m-3 shadow-lg">
+                                    <ul class="nav nav-tabs responsive">
+                                        <li class="active encabezado_card bg-blue col-6"><a data-toggle="tab" aria-current="page" href="#c1" aria-expanded="true">Conceptos básicos</a></li>
+                                        <li class="encabezado_card bg-cyan col-6"><a data-toggle="tab" href="#c3" aria-expanded="false">Otros conceptos</a></li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div id="c1" class="text-left tab-pane fade active in p-2 show active">
+                                            <p></p>
+                                            <p>Los conceptos básicos son:</p>
+                                            <p> · Alquiler para el inquilino</p>
+                                            <p> · Alquiler y administración para el Propietario</p>
+                                            <br>
+                                            <hr>
+                                            <br>
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">IVA Alquiler:</label>
+                                                </div>
+                                                <select class="form-control">
+                                                    <option value="0" selected="">No</option>
+                                                    <option value="d">Agregar discriminado</option>
+                                                    <option value="s">Sumar al alquiler</option>
+                                                </select>
+                                            </div>
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">IVA Admin.:</label>
+                                                </div>
+                                                <select class="form-control">
+                                                    <option value="0" selected="">No</option>
+                                                    <option value="d">Agregar discriminado</option>
+                                                    <option value="s">Sumar a la admin.</option>
+                                                </select>
+                                            </div>
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend mr-3">
+                                                    <input type="checkbox" class="btn btn-info">Omitir meses anteriores</label>
+                                                </div>
+                                                <div class="dpgTooltip">
+                                                    <div class="dpgTooltip_div">
+                                                        <p class="dpgTooltip_p">Si marcás esta opción, no se agregará ni modificará nada anterior al mes actual</p>
+                                                    </div>						
+                                                </div>
+                                            </div>	
+                                        </div>
+
+                                        <div id="c3" class="tab-pane fade">
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Detalle</label>
+                                                </div>
+                                                <input type="text" class="form-control">
+                                            </div>
+                                            @error('moneda_id') <span class="text-red-500">{{ $message }}</span>@enderror
+                                
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Monto</label>
+                                                </div>
+                                                <input type="number" class="bd form-control">
+                                            </div>
+                                            @error('moneda_id') <span class="text-red-500">{{ $message }}</span>@enderror
+                                            
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Contrato</label>
+                                                </div>
+                                                <select class="form-control">
+                                                    <option value="0" selected="">Sólo a este contrato</option>
+                                                    <option value="1">Concepto grupal</option>
+                                                </select>                                                
+                                            </div>
+                                                
+                                                {{-- <div class="dpgTooltip tooltipMuchoTexto">
+                                                    <div class="dpgTooltip_div">
+                                                        <p class="dpgTooltip_p "></p>
+                                                        <u><b>Sólo a este contrato:</b></u><br>
+                                                        El concepto se agrega sólo a este contrato.<br><br>
+                                                        <u><b>Concepto grupal:</b></u><br>
+                                                        Se agregará un concepto en cada uno de los contratos que pertenecen al grupo. En un segundo paso se podrán elegir más opciones. Nota: Si no se ha definido un grupo para este contrato (ver novedades #108 a #110) o no hay otros contratos en el grupo, esta opción estará deshabilitada.
+                                                    </div>
+                                                </div>				 --}}
+
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Tratamiento</label>
+                                                </div>	
+                                                <select class="form-control">
+                                                    <option value="R" selected="">Repetir este monto</option>
+                                                    <option value="I">Dividir en partes iguales</option>
+                                                    <option value="P">Prorratear según porcentajes</option>
+                                                </select>
+                                            </div>	
+
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Cálculo</label>
+                                                </div>
+                                                <select class="form-control">
+                                                    <option value="1" selected="">Mostrar en los conceptos</option>
+                                                    <option value="0">No incluir en los conceptos</option>
+                                                </select>
+                                            </div>						
+                                    
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Agregar a</label>
+                                                </div>
+                                                <select class="form-control">
+                                                    <option value="I">Recibo inquilino</option>
+                                                    <option value="P">Liquidación propietario</option>
+                                                    <option value="C">Ambos (cancelación)</option>
+                                                    <option value="D">Ambos (duplicado)</option>
+                                                    <option value="M">Ambos (50% cada uno)</option>
+                                                </select>
+                                            </div>
+                                                                    
+                                            {{-- <div class="dpgTooltip tooltipMuchoTexto">
+                                                <div class="dpgTooltip_div">
+                                                    <p class="dpgTooltip_p "></p>
+                                                    <u><b>Recibo / Liquidación</b></u><br>
+                                                    El concepto sólo se agregará en uno de los comprobantes<br><br>
+                                                    <u><b>Ambos (cancelación)</b></u><br>
+                                                    El concepto se agregará en ambos comprobantes de modo que se cancelen entre sí. Si el monto es positivo, se le cobrará al inquilino y se le reintegrará al propietario. Si el monto es negativo se le restará al inquilino y se le cobrará al propietario (por ejemplo, expensas extraordinarias).<br><br>
+                                                    <u><b>Ambos (duplicado)</b></u><br>
+                                                    El concepto se agregará en ambos comprobantes pero con distinto signo, de modo que se cobrará a ambos si el monto es positivo y se pagará a ambos si es negativo.<br><br>
+                                                    <u><b>Ambos (50% cada uno)</b></u><br>
+                                                    El concepto se agregará en ambos comprobantes por la mitad de su valor y con distinto signo. (Igual que el anterior pero por la mitad del importe)
+                                                </div>
+                                            </div>					 --}}
+
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <label type="button" class="btn btn-info">Meses</label>
+                                                </div>
+                                                <select class="form-control">
+                                                    <option value="1">Sólo el mes elegido (...)</option>
+                                                    <option value="T">Todos los meses</option>
+                                                    <option value="I">Intervalo de cuotas (...)</option>
+                                                        <optgroup label="por año">
+                                                            <option value="a1">Primer año</option>
+                                                            <option value="a2">Segundo año</option>
+                                                            <option value="a3">Tercer año</option>
+                                                        </optgroup>
+                                                        <optgroup label="por semestre">
+                                                            <option value="s1">Semestre 1</option>
+                                                            <option value="s2">Semestre 2</option>
+                                                            <option value="s3">Semestre 3</option>
+                                                            <option value="s4">Semestre 4</option>
+                                                            <option value="s5">Semestre 5</option>
+                                                            <option value="s6">Semestre 6</option>
+                                                        </optgroup>						
+                                                </select>
+                                            </div>
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <input type="checkbox" class="btn btn-info mr-3">Omitir meses anteriores</label>
+                                                </div>
+                                            </div>
+                                            <div class="input-group mb-3 col-12">
+                                                <div class="input-group-prepend">
+                                                    <input type="checkbox" class="btn btn-info mr-3">Dividir en cuotas</label>
+                                                </div>
+                                                <div class="input-group mb-3 col-12">
+                                                    <div class="input-group-prepend">
+                                                        <label type="button" class="btn btn-info">Dividir en</label>
+                                                    </div>
+                                                    <label type="button" class="btn btn-info">cuotas de $--</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                            
+
+                            <div id="agrConc_panelDer" style="width: 50%">
+                                <div class="card m-3 shadow-lg">
+                                    <div class="encabezado_card">Vista previa</div>
+                                        <div class="miniform_body">
+                                            <div class="lista_ext">
+                                                <div class="lista_int"> 
+                                                    <table class="table table-hover" id="">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Op.</th>
+                                                                <th>Detalle</th>
+                                                                <th>Monto</th>
+                                                                <th>Inq/Prop</th>
+                                                                <th>-/+	
+                                                                    {{-- <div class="dpgTooltip">
+                                                                        <div class="dpgTooltip_div">
+                                                                            El signo representa si el concepto finalmente supone un ingreso o un egreso para la inmobiliaria
+                                                                        </div>
+                                                                    </div>	 --}}
+                                                                </th>
+                                                                <th>Mes</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td colspan="4">
+                                                                    <span class="p12 gris">Presioná el botón 'vista previa' para ver el efecto en los contratos</span>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>	
+                                                </div>
+                                            </div>							
+                                            <div class="d-flex text-center mb-3" style="justify-content: center;">
+                                                <input type="button" class="btn btn-info m-1" value="&nbsp;&nbsp;&nbsp;Nuevos&nbsp;&nbsp;&nbsp;">
+                                                <input type="button" class="btn btn-info m-1" value="Modificar">
+                                                <input type="button" class="btn btn-info m-1" value="Ignorados">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>                                
+                    
+                        <div class="centro ancho mb-3">
+                            <button type="button" class="btn btn-primary">
+                                &nbsp;&nbsp;&nbsp;Vista previa&nbsp;&nbsp;&nbsp;
+                            </button>
+                            &nbsp;
+                            <button type="button" class="btn btn-info">
+                                &nbsp;Agregar / modificar
+                            </button>
+                        </div>
+
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @endif
+
+
+
+
+
 </div>
 
 
