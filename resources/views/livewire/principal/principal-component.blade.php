@@ -21,7 +21,7 @@
                 <input class="form-control" type="text" wire:modal="search" wire:keyup="CambiarVista()">
             </div>
             <div class="d-flex align-items-center">
-                {{ $contratos->links() }}
+                {{-- {{ $contratos->links() }} --}}
                 {{-- {!! $contratos->appends(Request::all())->links() !!} --}}
                 {{-- {!! $contratos->render() !!} --}}
             </div>
@@ -31,23 +31,25 @@
         <div class="card-body">
             <table class="table table-striped">
                 <tr>
-                <td>Id</td>
+                {{-- <td>Id</td> --}}
                 <td>FechaInicio</td>
                 <td>Fecha Fin</td>
                 <td>Inquilino</td>
                 <td>Propietario</td>
-                <td>Garante/s</td>
+                {{-- <td>Garante/s</td> --}}
+                <td>Domicilio</td>
                 <td>Opciones</td>
             </tr>
             @foreach ($contratos as $contrato)
                 {{-- @if(!$contrato->activo) --}}
                     <tr @if(!$contrato->activo) style="color: burlywood;" @endif>
-                        <td>{{ $contrato->id }}</td>
+                        {{-- <td>{{ $contrato->id }}</td> --}}
                         <td>{{  substr($contrato->fechainicio,8,2).'-'.substr($contrato->fechainicio,5,2).'-'.substr($contrato->fechainicio,0,4) }}</td>
                         <td>{{  substr($contrato->fechafin,8,2).'-'.substr($contrato->fechafin,5,2).'-'.substr($contrato->fechafin,0,4) }}</td>
                         <td>{{ $contrato->inquilino() }}</td>
                         <td>{{ $contrato->propietario() }}</td>
-                        <td>{!! $contrato->garantes($contrato->id) !!}</td>
+                        <td>domicilio</td>
+                        {{-- <td>{!! $contrato->garantes($contrato->id) !!}</td> --}}
                         <td>
                             <label style="border-radius: 10px;background-color: lightcoral ;padding: 2px 10px 2px 10px;" wire:click="modalEliminarContrato({{ $contrato->id }})" @if(!$contrato->activo) @disabled(true) @endif>Eliminar</label>
                             <label style="border-radius: 10px;background-color: lightgreen ;padding: 2px 10px 2px 10px;" wire:click="CargarIdContrato({{ $contrato->id }})" @if(!$contrato->activo) @disabled(true) @endif>Modificar</label>

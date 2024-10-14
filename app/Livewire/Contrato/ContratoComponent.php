@@ -5,6 +5,7 @@ namespace App\Livewire\Contrato;
 use App\Models\alqui_actualizacion;
 use App\Models\alqui_ajuste;
 use App\Models\alqui_contrato;
+use App\Models\alqui_detalle;
 use App\Models\alqui_garante;
 use App\Models\alqui_inquilino;
 use App\Models\alqui_moneda;
@@ -21,10 +22,10 @@ class ContratoComponent extends Component
 {
     // use WithPagination;
 
-    public $contrato_id, $bien_id, $fechainicio, $fechafin, $cuotas=12,$duracion=1;
+    public $contrato_id, $bien_id, $fechainicio, $fechafin, $cuotas=12,$duracion=1, $detalles;
     public $monedas, $actualizaciones, $tipoajustes;
 
-    public $intereses_punitorios_id=1, $gastos_administrativos=1, $actualizacion_id=1, $cant_meses, $html;
+    public $intereses_punitorios_id=1, $gastos_administrativos, $gastosadmin, $actualizacion_id=1, $cant_meses, $html;
 
     protected $inquilino_id_nuevo, $inquilinos_filtrados_fisica, $inquilinos_filtrados_juridica, $propietarios_filtrados_fisica, $propietarios_filtrados_juridica, $search;
 
@@ -32,7 +33,7 @@ class ContratoComponent extends Component
     public $bien_type=1, $periodos_observaciones='', $detalles_administra='', $detalles_lugar_pago, $detalles_cartera='', $estado=false, $actualizaciones_id, $tipoajustes_id;
     public $incluir_mora_graficos=true;
     public $c_part_por_diario, $c_part_dia_inicio, $c_part_dias_gracia, $c_part_porcentaje;
-    public $porcentaje_administrativos=0, $valor_administrativos=0, $administra_alquiler_id=1, $activo, $gastos_administrativos_id=1, $inquilino_id, $propietario_id, $cobrar_administrativos_punitorios=false, $reintegrar_punitorios=false, $moneda_id, $ajuste_id, $admin_porc, $admin_monto, $seguro_id=3, $vencimiento, $seguro_observaciones, $liquidacion_fraccionada;
+    public $porcentaje_administrativos=0, $valor_administrativos=0, $administra_alquiler_id=1, $activo, $gastos_administrativos_id, $inquilino_id, $propietario_id, $cobrar_administrativos_punitorios=false, $reintegrar_punitorios=false, $moneda_id, $ajuste_id, $admin_porc, $admin_monto, $seguro_id=3, $vencimiento, $seguro_observaciones, $liquidacion_fraccionada;
 
     public $c_general_por_diario=0, $c_general_dia_inicio=0, $c_general_dias_gracia=0,$c_general_porcentaje=0;
 
@@ -42,19 +43,20 @@ class ContratoComponent extends Component
     public $updateTypes = [];
     public $mostratModalOk=false, $modalCambioInquilino=false, $modalRescindirContrato=false, $modalRenovarContrato=false, $NuevaFechaInicioContrato, $modalGestionarConceptos;
 
-    public function mount() { $this->fechainicio = date_create()->format('Y-m-d'); }
+    public function mount() { $this->fechainicio = date_create()->format('Y-m-d'); $this->gastosadmin = 1;}
 
     public function render() {
-        
-        $this->bien_id = 1;
 
-        $this->Cargarlistados();
+        $this->gastos_administrativos_id=1;
+        $this->bien_id = 1;
+        $this->updateTypes['a1'] = 0;
+        $this->Cargarlistados(); //Carga los listados de los inquilinos y de los propietarios, tanto para las personas físicas como a las jurídicas
         $this->CambiarSeguro();
-        $this->monedas = alqui_moneda::all();
-        $this->actualizaciones = alqui_actualizacion::orderby('cantmeses')->get();
-        $this->tipoajustes = alqui_ajuste::all();
+        $this->monedas = alqui_moneda::all();   // Carga el listado de monedas disponibles
+        $this->actualizaciones = alqui_actualizacion::orderby('cantmeses')->get();  // Carga el listado de actualizaciones
+        $this->tipoajustes = alqui_ajuste::all();   // Carga los distintos tipos de ajuste de contrato IPC, BNA, etc
         $this->CambiarFechaInicio();
-        $this->CambiarActualizacion();
+        $this->CambiarActualizacion();  // Calcula y dibuja todas las escalas de actualización de los Valores
         // dd(session('contrato_id'));
         if(session('contrato_id')) { $this->CargarDatosDelContrato(session('contrato_id')); }
 
@@ -145,7 +147,11 @@ class ContratoComponent extends Component
     }
     
     public function CerrarModalGestionarConceptos() { $this->modalGestionarConceptos = false; }
-    public function AbrirModalGestionarConceptos() { $this->modalGestionarConceptos = true; }
+    public function AbrirModalGestionarConceptos() { 
+        $this->modalGestionarConceptos = true; 
+        if($this->contrato_id) $this->detalles = alqui_detalle::where('contrato_id','=',$this->contrato_id)->get();
+        // dd($this->detalles);
+    }
 
 
 
@@ -162,17 +168,23 @@ class ContratoComponent extends Component
     public function CambiarSeguro() { $this->seguro_id = $this->seguro_id;  if($this->seguro_id==3) $this->vencimiento=date(now()); }
 
     public function CambiarAdministrativos() { 
-        $this->gastos_administrativos = $this->gastos_administrativos; 
-        if($this->gastos_administrativos==2) { $this->porcentaje_administrativos = 0; } else { $this->valor_administrativos = 0; }
+
+        // dd($this->gastosadmin);
+        // dd($this->gastos_administrativos);
+        $this->gastos_administrativos = $this->gastos_administrativos_id; 
+        // if($this->gastos_administrativos==2) { $this->porcentaje_administrativos = 0; } else { $this->valor_administrativos = 0; }
     }
 
     public function CambiarActualizacion() { 
-        $this->actualizacion_id = $this->actualizacion_id; 
-        $this->cant_meses = alqui_actualizacion::find($this->actualizacion_id)->cantmeses; $html1='';
+        $this->updateTypes = [];
+        $b = alqui_actualizacion::find($this->actualizacion_id); 
+        $this->cant_meses = $b->cantmeses;
+        // dd($this->cant_meses);
+        $html1='';
         $a = 1;
         $fecha_inicial = $this->fechainicio; 
-        // $fecha_final = strtotime($fecha_inicial . "+ ".$this->cant_meses." months");
         $fecha_final = date("Y-m-d", strtotime($fecha_inicial . "+ ".$this->cant_meses." months"));
+
         for($i=1; $i<$this->cuotas/$this->cant_meses + 1; $i++) {
             
             $html1=$html1.'<tr>
@@ -183,23 +195,20 @@ class ContratoComponent extends Component
                                     <label style="font-size: 0.7rem">'.substr($fecha_final,8,2).'-'.substr($fecha_final,5,2).'-'.substr($fecha_final,0,4).'</label>
                                 </td>
                                 <td style="text-align: center;">';
-            if($i==1) { $html1 = $html1 . '<input type="number" size="16" wire:model="updateTypes.'.$i.'" style="background-color: aquamarine;border: black solid 1px;text-align: center;"><br>
+            if($i==1) { $html1 = $html1 . '<input type="text" value="'.$i.'" size="16" wire:model="updateTypes.a'.$i.'" style="background-color: aquamarine;border: black solid 1px;text-align: center;"><br>
                 <label style="font-size: 0.8rem">
                     Valor Inicial
                 </label>'; } 
-            else { $html1 = $html1 . '<input type="number" size="16" wire:model="updateTypes.'.$i.'" style="background-color: floralwhite;
-                border: black solid 1px;text-align: center;"><br>
-                <label style="font-size: 0.8rem">Valor Parcial</label>'; }
+            else { $html1 = $html1 . '<input type="text" value="'.$i.'" size="16" wire:model="updateTypes.a'.$i.'" style="background-color: floralwhite; border: black solid 1px;text-align: center;"><br> <label style="font-size: 0.8rem">Valor Parcial</label>'; }
             $html1 = $html1 . '</td>
                             </tr>';
-        
+
             $a = $i*$this->cant_meses+1;
 
             $fecha_inicial = date("Y-m-d", strtotime($fecha_final . "+ 1 days")); 
             $fecha_final = date("Y-m-d", strtotime($fecha_inicial . "+ ".$this->cant_meses." months"));
         }
         $this->html = $html1;
-        // dd($this->$html);
     }
 
     public function Cargarlistados(){
@@ -253,7 +262,7 @@ class ContratoComponent extends Component
         $this->fechafin=$a->fechafin;
         $this->periodos_observaciones=$a->periodos_observaciones;
         $this->moneda_id=$a->moneda_id;
-        $this->actualizacion_id=1; //$a->actualizaciones_id;
+        $this->actualizacion_id=$a->actualizacion_id;
         $this->ajuste_id=$a->tipoajustes_id;
         $this->bien_type=$a->bien_type;
         $this->bien_id=$a->bien_id;
@@ -314,12 +323,25 @@ class ContratoComponent extends Component
                 $this->garantes[$garantes->id] = array($garantes->razonsocial, (string) $garantes->id, 'juridica');       
             }
         }
+        
+        $rangos = json_decode($a->valores);
 
+        $i = 1 ;
+        if($rangos) {
+            foreach($rangos as $rango) {
+                $r = 'a'.$i;
+                $this->updateTypes[$r] = $rangos->$r;
+                $i++;
+            }
+        }
         $this->contrato_id = $contrato_id;
+
+        $this->CambiarActualizacion();
     }
 
     public function store() {
-
+        if(isset($this->updateTypes['a1']) && is_numeric($this->updateTypes['a1'])) {} else {  session()->flash('mensaje', 'Falta definir el valor para el primer período.'); dd('a'); exit; };
+        // dd($this->updateTypes);
         $this->validate ([
             'bien_id'=>'required',
             'duracion'=>'required',
@@ -362,7 +384,7 @@ class ContratoComponent extends Component
         ]);
                 // dd(json_encode($this->updateTypes));
 
-            // dd($this->propietario_id."pppp");
+            // dd($this->actualizaciones_id);
         $a = alqui_contrato::updateOrCreate(['id' => $this->contrato_id],[
             'duracion'=>$this->duracion,
             'cuotas'=>$this->cuotas,
@@ -398,13 +420,15 @@ class ContratoComponent extends Component
             'gastos_administrativos_id'=>$this->gastos_administrativos_id,
             'valor_administrativos'=>$this->valor_administrativos,
             'porcentaje_administrativos'=>$this->porcentaje_administrativos,
-            'cant_meses'=>$this->cant_meses,            
+            'cant_meses'=>$this->cant_meses,
             'seguro_id'=>$this->seguro_id,
             'vencimiento'=>$this->vencimiento,
             'seguro_observaciones'=>$this->seguro_observaciones,
             'liquidacion_fraccionada'=>$this->liquidacion_fraccionada,
-            'valores' => json_encode($this->updateTypes), // garantes
-            'ajuste_id'=>$this->ajuste_id,        
+            // 'valores' => json_encode( array_slice($this->updateTypes, 0, $this->cant_meses)),   // solo guarda los rangos definidos
+            'valores' => json_encode($this->updateTypes),
+            'ajuste_id'=>$this->ajuste_id,
+            'activo'=>true,
 
         ]);
 
@@ -428,14 +452,61 @@ class ContratoComponent extends Component
             //     'persona_type' =>$garante[2],
             //     'activo' =>true,
             // ]);
-
+// dd($a->id);
         }
+        // if($this->contrato_id==null) {
+        //     $this->GuardarConceptos($a->id);
+        // }
 
         $this->mostratModalOk = true;
         session()->flash('mensaje', 'Se guardó el contrato.');
 
         // 'bien_id'=>$this->bien_id,C
     }
+
+
+    public function GuardarConceptos($contrato_id) {
+        $b = alqui_contrato::find($contrato_id);
+        
+        // $duracion_años = $b->duracion;
+        // $fecha_fin = $b->fecha_fin;
+
+        $cuotas_totales = $b->cuotas;
+        $fecha_inicio = $b->fechainicio;
+        $cant_meses = alqui_actualizacion::find($b->actualizacion_id)->cantmeses;
+        
+        $valores =json_decode($b->valores);
+        $mes_del_periodo = 1;
+        $periodo = 1;
+        $mes = 1;
+
+        for($i=1;$i<=$cuotas_totales;$i++) {
+            $detalle = new alqui_detalle();
+            $detalle->detalle ='Alquiler';
+            
+            $r = 'a'.$periodo;
+            $detalle->monto = $valores->$r;
+
+            $detalle->mostrar_en_conceptos = true;
+            
+            $detalle->mes = date("m",strtotime($fecha_inicio));
+            $detalle->anio = date("Y",strtotime($fecha_inicio));
+            $detalle->cuota = $i;
+            $detalle->quien = 'Inquilino';
+
+            $detalle->contrato_id = $contrato_id;
+
+            $fecha_vencimiento =  date("Y-m-d", strtotime($fecha_inicio . "+ 10 days"));
+            $detalle->fecha_vencimiento = date("Y-m-d", strtotime($fecha_vencimiento . "+ 1 month"));
+            $fecha_inicio = date("Y-m-d", strtotime($fecha_inicio . "+ 1 month"));          
+            
+            if($mes_del_periodo==$cant_meses) { $mes_del_periodo=1; $periodo++; } else { $mes_del_periodo++; }
+            $mes++;
+            
+            $detalle->save();
+        }
+    }
+
 
     public function CargarListado($quien) {
         $this->buscar =$quien;
@@ -474,9 +545,9 @@ class ContratoComponent extends Component
         }
     }
 
-    public function VerGarantes() {
-        dd(json_encode($this->garantes));
-    }
+    // public function VerGarantes() {
+    //     dd(json_encode($this->garantes));
+    // }
 
     public function Elegir($tipo, $id) {
         if($tipo=='fisica') {
@@ -484,7 +555,7 @@ class ContratoComponent extends Component
                 case 'Propietarios':
                     $a = persona_fisica::find($id); $this->propietario_text = $a->apellidos.', '.$a->nombres; $this->propietario_id = $a->id; break;
                 case 'Inquilinos':
-                    $a = persona_fisica::find($id); $this->inquilino_text = $a->apellidos.', '.$a->nombres; $this->inquilino_id = $a->id; dd(($this->inquilino_id.'-'.$this->inquilino_text.'-'.$this->contrato_id)); break;
+                    $a = persona_fisica::find($id); $this->inquilino_text = $a->apellidos.', '.$a->nombres; $this->inquilino_id = $a->id; break;
                 case 'Garantes':
                     // $a = persona_fisica::find($id); $this->garantes[$a->id] = $a->apellidos.', '.$a->nombres; break;
                     $a = persona_fisica::find($id); $this->garantes[$a->id] = array($a->apellidos.', '.$a->nombres, (string) $a->id, 'fisica'); break;

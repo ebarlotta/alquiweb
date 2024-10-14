@@ -9,15 +9,18 @@
 
     {{-- Mensaje --}}
     {{-- ======= --}}
-    @if(Session::has('mensaje'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
-            {{Session::get('mensaje')}}
-        </div>  
-    @endif
+    
 
     <div class="col-12 d-flex flex-wrap">
+
+        @if(Session::has('mensaje'))
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
+                {{ Session::get('mensaje')}}
+            </div>  
+        @endif
+    
         <div class="col-6 col-sm-6">
 
             {{-- Tipo --}}
@@ -28,7 +31,7 @@
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Tipo</label>
                         </div>
-                        <select class="form-control" wire:model="bien_type">
+                        <select class="form-control" wire:model="bien_type" @if(session('contrato_id')) disabled @endif>
                             <option value="0" selected>-- Seleccione uno --</option>
                             <option value="1">Alquiler local/casa</option>
                             <option value="2">Vehículo</option>
@@ -47,7 +50,7 @@
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Duración</label>
                         </div>
-                        <select class="form-control" wire:model="duracion" wire:change="CambiarCuotas()">
+                        <select class="form-control" wire:model="duracion" wire:change="CambiarCuotas()" @if(session('contrato_id')) disabled @endif>
                             <option value="1">1 año</option>
                             <option value="2">2 años</option>
                             <option value="3">3 años</option>
@@ -61,7 +64,7 @@
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Inicio</label>
                         </div>
-                        <input type="date" class="form-control" wire:model="fechainicio" wire:change="CambiarFechaInicio()">
+                        <input type="date" class="form-control" wire:model="fechainicio" wire:change="CambiarFechaInicio()" @if(session('contrato_id')) disabled @endif>
                         @error('fechainicio') <span class="text-red-500">{{ $message }}</span>@enderror
                     </div>
                     <div class="input-group mb-3 col-12 col-sm-6">
@@ -275,7 +278,7 @@
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Moneda</label>
                         </div>
-                        <select class="form-control" wire:model="moneda_id">
+                        <select class="form-control" wire:model="moneda_id" @if(session('contrato_id')) disabled @endif>
                             <option value="">Selecciona una moneda</option>
                             @foreach ($monedas as $moneda)
                                 <option value="{{ $moneda->id }}">{{ $moneda->signo}} - {{ $moneda->monedadescripcion}}</option>
@@ -289,7 +292,7 @@
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Actualización</label>
                         </div>
-                        <select class="form-control" wire:model="actualizacion_id" wire:change="CambiarActualizacion()">
+                        <select class="form-control" wire:model="actualizacion_id" wire:change="CambiarActualizacion()" @if(session('contrato_id')) disabled @endif>
                             <option value="">Selecciona una actualizacion</option>
                             @foreach ($actualizaciones as $actualizacion)
                                 <option value="{{ $actualizacion->id }}">{{ $actualizacion->cantmeses}} - {{ $actualizacion->actualizaciondescripcion}}</option>
@@ -303,7 +306,7 @@
                         <div class="input-group-prepend">
                             <label type="button" class="btn btn-info">Tipo Ajuste</label>
                         </div>
-                        <select class="form-control" wire:model="ajuste_id">
+                        <select class="form-control" wire:model="ajuste_id" @if(session('contrato_id')) disabled @endif>
                             <option value="">Selecciona un tipo</option>
                             @foreach ($tipoajustes as $tipoajuste)
                                 <option value="{{ $tipoajuste->id }}">{{ $tipoajuste->ajustedescripcion}}</option>
@@ -321,11 +324,19 @@
                         </tr>
                             {!! $html !!}                        
                     </table>
-                    <div class="input-group mb-3 col-12 col-sm-6">
+                    <div class="input-group mb-3 col-12 col-sm-6 mt-3">
                         <div class="input-group-prepend">
-                            <input type="checkbox" class="btn btn-info" value="Liquidación Fraccionada" wire:model="liquidacion_fraccionada">Liquidación Fraccionada
+                            <input type="checkbox" class="btn btn-info mr-2" value="Liquidación Fraccionada" wire:model="liquidacion_fraccionada">
+                            Liquidación Fraccionada
                         </div>
                     </div>
+                    @if(Session::has('mensaje'))
+                        <div class="alert alert-success alert-dismissible" role="alert">
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
+                            {{ Session::get('mensaje')}}
+                        </div>  
+                    @endif
                     <input type="button" class="btn btn-info" value="Fijar Valores" wire:click="CambiarValores()">
                 </div>
             </div>
@@ -345,23 +356,37 @@
                 <div class="card-body d-flex flex-wrap">
                     <div class="input-group col-12">
                         <label  type="button" class="btn btn-info">Tipo</label>
-                        <select class="form-control" wire:model="gastos_administrativos_id" wire:change="CambiarAdministrativos()">
+                        <select class="form-control" wire:model="gastosadmin" wire:change="CambiarAdministrativos()">
                             <option value="1">Porcentual del alquiler</option>
                             <option value="2">Monto en pesos</option>
                         </select>
                     </div>
                     @error('gastos_administrativos_id') <span class="text-red-500">{{ $message }}</span>@enderror
 
-                    <div class="input-group mt-3 col-6" @disabled(true)>
-                        <label  type="button" class="btn btn-info col-6">Porcentaje</label>
-                        <input type="text" class="form-control" @if($gastos_administrativos_id==2) disabled @endif wire:model="porcentaje_administrativos">                        
-                    </div>
+                    @if($gastosadmin=="2") 
+                        <div class="input-group mt-3 col-6">
+                            <label  type="button" class="btn btn-info col-6">Porcentaje</label>
+                            <input type="text" class="form-control" disabled wire:model="porcentaje_administrativos">                        
+                        </div>
+                    @else
+                        <div class="input-group mt-3 col-6">
+                            <label  type="button" class="btn btn-info col-6">Porcentaje</label>
+                            <input type="text" class="form-control" wire:model="porcentaje_administrativos">                        
+                        </div>
+                    @endif
                     @error('porcentaje_administrativos') <span class="text-red-500">{{ $message }}</span>@enderror
 
-                    <div class="input-group mt-3 col-6">
-                        <label  type="button" class="btn btn-info col-6">Monto</label>
-                        <input type="text" class="form-control" @if($gastos_administrativos_id==1) disabled @endif wire:model="valor_administrativos">    
-                    </div>
+                    @if($gastosadmin=="1") 
+                        <div class="input-group mt-3 col-6">
+                            <label  type="button" class="btn btn-info col-6">Monto</label>
+                            <input type="text" class="form-control" disabled wire:model="valor_administrativos">    
+                        </div>
+                    @else
+                        <div class="input-group mt-3 col-6">
+                            <label  type="button" class="btn btn-info col-6">Monto</label>
+                            <input type="text" class="form-control" wire:model="valor_administrativos">    
+                        </div>
+                    @endif
                     @error('valor_administrativos') <span class="text-red-500">{{ $message }}</span>@enderror
 
                 </div>
@@ -443,10 +468,13 @@
             
         </div>
 
-        <input class="btn btn-info" type="button" value="Ver Garantes" wire:click="VerGarantes()">
+        {{-- <input class="btn btn-info" type="button" value="Ver Garantes" wire:click="VerGarantes()"> --}}
 
-        <div class="col-12">
-            <input class="btn btn-success col-12" type="button" value="Guardar" wire:click="store()">
+        <div class="col-12 d-flex">
+            <a class="col-6" href="principal">
+                <input class="btn btn-info col-12" type="button" value="Volver" wire:click="store()">
+            </a>
+            <input class="btn btn-success col-6" type="button" value="Guardar" wire:click="store()">
         </div>
 
 
@@ -746,10 +774,10 @@
             </div>
 
             <div class="modal-dialog mt-20 d-flex text-center" role="document" style="max-width: 100%;margin-left: 16%;">
-                <div class="modal-content" style="width: 70rem;">
+                <div class="modal-content" style="width: 80rem;">
                     <div class="modal-header">
-                        <h5 class="modal-title">Gestionar Conceptos</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <h5 class="modal-title encabezado_card" style="width: 98%">Gestionar Conceptos</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" wire:click="CerrarModalGestionarConceptos()">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
@@ -794,7 +822,7 @@
                                             </div>
                                             <div class="input-group mb-3 col-12">
                                                 <div class="input-group-prepend mr-3">
-                                                    <input type="checkbox" class="btn btn-info">Omitir meses anteriores</label>
+                                                    <input type="checkbox" class="btn btn-info mr-2"> Omitir meses anteriores
                                                 </div>
                                                 <div class="dpgTooltip">
                                                     <div class="dpgTooltip_div">
@@ -958,6 +986,16 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
+                                                            @foreach ($detalles as $detalle)
+                                                            <tr>
+                                                                <td>{{ date("d-m-Y",strtotime($detalle->fecha_vencimiento)) }} </td>
+                                                                <td>{{ $detalle->detalle }} </td>
+                                                                <td>{{ $detalle->monto }} </td>
+                                                                <td>{{ $detalle->quien }} </td>
+                                                                <td>{{ $detalle->mes }} </td>
+                                                                <td>{{ $detalle->anio }} </td>
+                                                            </tr>
+                                                            @endforeach
                                                             <tr>
                                                                 <td colspan="4">
                                                                     <span class="p12 gris">Presioná el botón 'vista previa' para ver el efecto en los contratos</span>
@@ -979,6 +1017,9 @@
                         </div>                                
                     
                         <div class="centro ancho mb-3">
+                            <button type="button" class="btn btn-primary" wire:click="GuardaConceptos()">
+                                Guarda Conceptos
+                            </button>
                             <button type="button" class="btn btn-primary">
                                 &nbsp;&nbsp;&nbsp;Vista previa&nbsp;&nbsp;&nbsp;
                             </button>

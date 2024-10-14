@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 use LDAP\Result;
 
 class alqui_contrato extends Model
@@ -48,7 +49,6 @@ class alqui_contrato extends Model
     ];
 
     public function inquilino() {
-        
         $a = alqui_inquilino::where('persona_id','=',$this->inquilino_id)->get();
 
         if($a[0]->persona_type == 'fisica') { 
