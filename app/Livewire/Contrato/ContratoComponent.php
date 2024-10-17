@@ -13,7 +13,9 @@ use App\Models\alqui_propietarios;
 use App\Models\alqui_rel_contrato_garante;
 use App\Models\persona_fisica;
 use App\Models\persona_juridica;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
+
 
 // use Livewire\WithPagination;
 
@@ -25,7 +27,7 @@ class ContratoComponent extends Component
     public $contrato_id, $bien_id, $fechainicio, $fechafin, $cuotas=12,$duracion=1, $detalles;
     public $monedas, $actualizaciones, $tipoajustes;
 
-    public $intereses_punitorios_id=1, $gastos_administrativos, $gastosadmin, $actualizacion_id=1, $cant_meses, $html;
+    public $intereses_punitorios_id=1, $gastos_administrativos, $gastosadmin, $actualizacion_id, $cant_meses, $html, $cmbIvaAlquiler, $cmbIvaAdmin;
 
     protected $inquilino_id_nuevo, $inquilinos_filtrados_fisica, $inquilinos_filtrados_juridica, $propietarios_filtrados_fisica, $propietarios_filtrados_juridica, $search;
 
@@ -41,14 +43,16 @@ class ContratoComponent extends Component
     public $garantes, $garantes_ids, $numero;
     public $valor = [60];
     public $updateTypes = [];
-    public $mostratModalOk=false, $modalCambioInquilino=false, $modalRescindirContrato=false, $modalRenovarContrato=false, $NuevaFechaInicioContrato, $modalGestionarConceptos;
+    public $mostratModalOk=false, $modalCambioInquilino=false, $modalRescindirContrato=false, $modalRenovarContrato=false, $NuevaFechaInicioContrato, $modalGestionarConceptos, $verConceptos=1;
 
-    public function mount() { $this->fechainicio = date_create()->format('Y-m-d'); $this->gastosadmin = 1;}
+    public $OCDetalle, $OCMonto, $OCContrato, $OCMes_Todos, $OCMes, $OCMesSolo, $OCRepetir, $OCCalculo, $OCAgregar;
+
+    public function mount() { $this->fechainicio = date_create()->format('Y-m-d'); $this->gastosadmin = 1; $this->bien_id = 1; $this->actualizacion_id = 1; }
 
     public function render() {
 
         $this->gastos_administrativos_id=1;
-        $this->bien_id = 1;
+        
         $this->updateTypes['a1'] = 0;
         $this->Cargarlistados(); //Carga los listados de los inquilinos y de los propietarios, tanto para las personas físicas como a las jurídicas
         $this->CambiarSeguro();
@@ -146,14 +150,27 @@ class ContratoComponent extends Component
         // dd(($this->inquilino_id.'-'.$this->inquilino_text.'-'.$this->contrato_id));
     }
     
-    public function CerrarModalGestionarConceptos() { $this->modalGestionarConceptos = false; }
-    public function AbrirModalGestionarConceptos() { 
-        $this->modalGestionarConceptos = true; 
-        if($this->contrato_id) $this->detalles = alqui_detalle::where('contrato_id','=',$this->contrato_id)->get();
-        // dd($this->detalles);
+    public function MostrarConceptos($id) {
+        if($id==1) $this->verConceptos=1;
+        if($id==2) $this->verConceptos=2;
     }
+    public function CerrarModalGestionarConceptos() { $this->modalGestionarConceptos = false; }
 
+    public function CambiarSeguro() { $this->seguro_id = $this->seguro_id;  if($this->seguro_id==3) $this->vencimiento=date(now()); }
+    
+    public function AbrirModalGestionarConceptos() { 
+        $this->modalGestionarConceptos = true;
+        if($this->contrato_id) { 
+            $contrato = alqui_contrato::find($this->contrato_id);
+            $this->valores =  array($contrato->valores);
+            $this->detalles = alqui_detalle::where('contrato_id','=',$this->contrato_id)->orderby('fecha_vencimiento')->get(); 
+            if(count($this->updateTypes)>count($this->valores)){ 
+                $contrato->valores = $this->updateTypes;
+                $contrato->save();
+            }
 
+        }
+    }
 
     public function CambiarValores() { 
         // $this->updateTypes(count($this->updateTypes));
@@ -164,11 +181,8 @@ class ContratoComponent extends Component
         // ]);
         dd($this->updateTypes);
     }
-    // public function CambiarValores($id, $val) { $this->valor[$id] = $val;  dd( $this->valor[$id]);}
-    public function CambiarSeguro() { $this->seguro_id = $this->seguro_id;  if($this->seguro_id==3) $this->vencimiento=date(now()); }
 
     public function CambiarAdministrativos() { 
-
         // dd($this->gastosadmin);
         // dd($this->gastos_administrativos);
         $this->gastos_administrativos = $this->gastos_administrativos_id; 
@@ -180,6 +194,8 @@ class ContratoComponent extends Component
         $b = alqui_actualizacion::find($this->actualizacion_id); 
         $this->cant_meses = $b->cantmeses;
         // dd($this->cant_meses);
+        $this->OCMes = [];
+
         $html1='';
         $a = 1;
         $fecha_inicial = $this->fechainicio; 
@@ -202,15 +218,27 @@ class ContratoComponent extends Component
             else { $html1 = $html1 . '<input type="text" value="'.$i.'" size="16" wire:model="updateTypes.a'.$i.'" style="background-color: floralwhite; border: black solid 1px;text-align: center;"><br> <label style="font-size: 0.8rem">Valor Parcial</label>'; }
             $html1 = $html1 . '</td>
                             </tr>';
-
             $a = $i*$this->cant_meses+1;
 
             $fecha_inicial = date("Y-m-d", strtotime($fecha_final . "+ 1 days")); 
             $fecha_final = date("Y-m-d", strtotime($fecha_inicial . "+ ".$this->cant_meses." months"));
         }
         $this->html = $html1;
+
+        // Carga el combo del detalle de conceptos adicionales
+        $fecha_inicial = $this->fechainicio; 
+        for($i=1; $i<$this->cuotas+1; $i++) {
+            array_push($this->OCMes,date("M", strtotime($fecha_inicial)).'/'.date("Y", strtotime($fecha_inicial)));
+            $fecha_inicial = date("Y-m-d", strtotime($fecha_inicial . "+ 1 months"));
+        }
+        // dd($this->OCMes);
     }
 
+    public function CambiarMeses() {
+        // dd($this->OCMes_Todos);
+        // if($this->OCMes_Todos=='T') { $this->OCMes_Todos = '1'; } else { $this->OCMes_Todos = 'T'; }
+        // dd($this->OCMes_Todos);
+    }
     public function Cargarlistados(){
 
         $this->inquilinos_filtrados_fisica = alqui_inquilino::join('persona_fisicas','alqui_inquilinos.persona_id','persona_fisicas.id')
@@ -335,11 +363,12 @@ class ContratoComponent extends Component
             }
         }
         $this->contrato_id = $contrato_id;
-
-        $this->CambiarActualizacion();
+        // dd($this->updateTypes);
+        // $this->CambiarActualizacion();
     }
 
     public function store() {
+        // dd($this->updateTypes['a1']);
         if(isset($this->updateTypes['a1']) && is_numeric($this->updateTypes['a1'])) {} else {  session()->flash('mensaje', 'Falta definir el valor para el primer período.'); dd('a'); exit; };
         // dd($this->updateTypes);
         $this->validate ([
@@ -429,6 +458,7 @@ class ContratoComponent extends Component
             'valores' => json_encode($this->updateTypes),
             'ajuste_id'=>$this->ajuste_id,
             'activo'=>true,
+            'user_id'=>Auth::user()->id,
 
         ]);
 
@@ -452,7 +482,7 @@ class ContratoComponent extends Component
             //     'persona_type' =>$garante[2],
             //     'activo' =>true,
             // ]);
-// dd($a->id);
+        // dd($a->id);
         }
         // if($this->contrato_id==null) {
         //     $this->GuardarConceptos($a->id);
@@ -464,50 +494,249 @@ class ContratoComponent extends Component
         // 'bien_id'=>$this->bien_id,C
     }
 
-
-    public function GuardarConceptos($contrato_id) {
-        $b = alqui_contrato::find($contrato_id);
+    public function GuardarOtrosConceptos() {
+        alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('vistaprevia','=',1)->delete(); // Elimina todos los restos anteriores sin terminar
+        if($this->OCContrato<>"1") { // Busca todos los contratos de la inmobiliaria y los coloca en un array
+            $contratos = alqui_contrato::where('user_id','=',Auth::user()->id)->get('id'); 
+            $cantidad_de_contratos = count($contratos);
+        } else {
+            $contratos = alqui_contrato::where('id','=',$this->contrato_id)->get(); 
+            $cantidad_de_contratos = 1;
+        }
         
-        // $duracion_años = $b->duracion;
-        // $fecha_fin = $b->fecha_fin;
+        for($i=0;$i<$cantidad_de_contratos;$i++) {  // Este primer bucle se itera desde 1 hasta la cantidad de contratos a actualizar
+            $detalle = new alqui_detalle();
+            if($this->OCMes_Todos="1") {
+                $this->CargarAnioMesYCuota($detalle,$this->OCMesSolo,$this->contrato_id);                
+                $this->CargarAgregarA($detalle,$this->OCMonto);
+
+            } else {
+
+            }
+        }
+        
+        $this->detalles = alqui_detalle::where('contrato_id','=',$this->contrato_id)->orderby('fecha_vencimiento')->get();
+    }
+
+    public function CargarAgregarA($detalle, $monto) {
+        switch($this->OCAgregar) {
+            case 'I': //Recibo inquilino
+                $detalle->monto = $monto; 
+                $detalle->quien = 'Inq.';
+                $detalle->signo = '+'; 
+                $detalle->detalle = 'Recibo inquilino' . $this->OCDetalle; 
+        // dd($detalle);
+
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                break;
+            case 'P': //Liquidación Propietario
+                $detalle->monto = $monto; 
+                $detalle->quien = 'Prop.';
+                $detalle->signo = '-'; 
+                $detalle->detalle = 'Liquidación Propietario' . $this->OCDetalle; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                break; 
+            case 'C': //Ambos Cancelación
+                $detalle->monto = $monto; 
+                $detalle->quien = 'Inq.';
+                $detalle->signo = '+'; 
+                $detalle->detalle = 'Ambos Cancelación' . $this->OCDetalle; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                $detalle->quien = 'Prop.';
+                $detalle->signo = '-'; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                break; 
+            case 'D': break; //Ambos Duplicado
+                $detalle->monto = $monto; 
+                $detalle->quien = 'Inq.';
+                $detalle->signo = '+'; 
+                $detalle->detalle = 'Ambos Duplicado' . $this->OCDetalle; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                $detalle->monto = -$monto; 
+                $detalle->quien = 'Prop.';
+                $detalle->signo = '+'; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                break; 
+            case 'M': break; //Ambos 50% cada uno
+                $detalle->monto = $monto/2; 
+                $detalle->quien = 'Inq.';
+                $detalle->signo = '+'; 
+                $detalle->detalle = 'Ambos 50% cada uno' . $this->OCDetalle; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                $detalle->monto = -$monto/2; 
+                $detalle->quien = 'Prop.';
+                $detalle->signo = '+'; 
+                if($this->NoEstaRepetido($detalle->detalle,$detalle->anio,$detalle->quien,$detalle->mes,$detalle->contrato_id)) $detalle->save();
+                break; 
+        }
+    }
+
+    public function CargarAnioMesYCuota($detalle, $periodo, $contrato_id) {
+        switch(substr($periodo,0,3)) {
+            case 'Jan': $detalle->mes='01'; break;
+            case 'Feb': $detalle->mes='02'; break;
+            case 'Mar': $detalle->mes='03'; break;
+            case 'Apr': $detalle->mes='04'; break;
+            case 'May': $detalle->mes='05'; break;
+            case 'Jun': $detalle->mes='06'; break;
+            case 'Jul': $detalle->mes='07'; break;
+            case 'Aug': $detalle->mes='08'; break;
+            case 'Sep': $detalle->mes='09'; break;
+            case 'Oct': $detalle->mes='10'; break;
+            case 'Nov': $detalle->mes='11'; break;
+            case 'Dec': $detalle->mes='12'; break;
+        }
+        $detalle->anio = substr($periodo,-4,4);
+        $a = alqui_detalle::where('contrato_id','=',$contrato_id)
+        ->where('mes','=',$detalle->mes)
+        ->where('anio','=',$detalle->anio)
+        ->get();
+        $detalle->fecha_vencimiento = $a[0]['fecha_vencimiento']; 
+        $detalle->cuota = $a[0]['cuota'];
+        $detalle->contrato_id = $contrato_id;
+        $detalle->vistaprevia = true;
+        $detalle->mostrar_en_conceptos = true;
+
+            //OCDetalle
+            //OCMonto
+            //OCContrato  // Este contrato, todos los contratos ?
+            //OCMes_Todos // Sólo este més o todos los meses
+            //OCMes       // Mes seleccionado
+//
+            //OCRepetir
+            //OCCalculo
+            //OCAgregar
+    }
+
+    public function GuardarConceptos() {
+
+        if(session('contrato_id')) {
+        $b = alqui_contrato::find(session('contrato_id'));
+        
+        alqui_detalle::where('contrato_id','=',$this->contrato_id)
+        ->where('vistaprevia','=',1)
+        ->delete();
 
         $cuotas_totales = $b->cuotas;
         $fecha_inicio = $b->fechainicio;
         $cant_meses = alqui_actualizacion::find($b->actualizacion_id)->cantmeses;
-        
+        // dd(count($this->updateTypes));
         $valores =json_decode($b->valores);
         $mes_del_periodo = 1;
         $periodo = 1;
         $mes = 1;
 
-        for($i=1;$i<=$cuotas_totales;$i++) {
+        for($i=1;$i<=$cant_meses*count($this->updateTypes);$i++) {
+            // for($i=1;$i<=$cuotas_totales;$i++) {
             $detalle = new alqui_detalle();
-            $detalle->detalle ='Alquiler';
-            
+
             $r = 'a'.$periodo;
             $detalle->monto = $valores->$r;
+            $this->CargarDetalle($detalle,'Alquiler',true,true,$i,'Inq.',$fecha_inicio);
+            if($this->NoEstaRepetido('Alquiler',$detalle->anio,$detalle->quien,$detalle->mes,$this->contrato_id)) $detalle->save();            
 
-            $detalle->mostrar_en_conceptos = true;
-            
-            $detalle->mes = date("m",strtotime($fecha_inicio));
-            $detalle->anio = date("Y",strtotime($fecha_inicio));
-            $detalle->cuota = $i;
-            $detalle->quien = 'Inquilino';
+            // $detalle->detalle ='Alquiler';
+            // $r = 'a'.$periodo;
+            // $detalle->monto = $valores->$r;
+            // $detalle->mostrar_en_conceptos = true;
+            // $detalle->vistaprevia = true;
+            // $detalle->mes = date("m",strtotime($fecha_inicio));
+            // $detalle->anio = date("Y",strtotime($fecha_inicio));
+            // $detalle->cuota = $i;
+            // $detalle->quien = 'Inq.';
+            // $detalle->contrato_id = session('contrato_id');
+            // $fecha_vencimiento =  date("Y-m-d", strtotime($fecha_inicio . "+ 10 days"));
+            // $detalle->fecha_vencimiento = date("Y-m-d", strtotime($fecha_vencimiento . "+ 1 month"));            
 
-            $detalle->contrato_id = $contrato_id;
 
-            $fecha_vencimiento =  date("Y-m-d", strtotime($fecha_inicio . "+ 10 days"));
-            $detalle->fecha_vencimiento = date("Y-m-d", strtotime($fecha_vencimiento . "+ 1 month"));
-            $fecha_inicio = date("Y-m-d", strtotime($fecha_inicio . "+ 1 month"));          
+            // IVA Agregar Discriminado
+            // ========================
+            if($this->cmbIvaAlquiler == 'd') {
+                $detalle = new alqui_detalle();
+                
+                $r = 'a'.$periodo;
+                $detalle->monto = $valores->$r*0.21;    // Diferencia
+                $this->CargarDetalle($detalle,'Iva Alquiler',true,true,$i,'Inq.',$fecha_inicio);
+                if($this->NoEstaRepetido('Iva Alquiler',$detalle->anio,$detalle->quien,$detalle->mes,$this->contrato_id)) $detalle->save();            
+
+                alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('detalle','=','Alquiler con iva')->where('vistaprevia','=',1)->delete();  // Elimina los detalles si está seleccionado Sumar al 
+
+                // $detalle->detalle ='Iva Alquiler'; $r = 'a'.$periodo; $detalle->mostrar_en_conceptos = true; $detalle->vistaprevia = true; $detalle->mes = date("m",strtotime($fecha_inicio)); $detalle->anio = date("Y",strtotime($fecha_inicio)); $detalle->cuota = $i; $detalle->quien = 'Inq.'; $detalle->contrato_id = session('contrato_id'); $detalle->fecha_vencimiento = date("Y-m-d", strtotime($fecha_vencimiento . "+ 1 month"));
+
+            }
+
+            if($this->cmbIvaAlquiler == 's') {
+                $detalle = new alqui_detalle();
+                $r = 'a'.$periodo;
+                $detalle->monto = $valores->$r*1.21;    // Diferencia
+                $this->CargarDetalle($detalle,'Alquiler con iva',true,true,$i,'Inq.',$fecha_inicio);
+                if($this->NoEstaRepetido('Alquiler con iva',$detalle->anio,$detalle->quien,$detalle->mes,$this->contrato_id)) $detalle->save();
+                alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('detalle','=','Alquiler')->where('vistaprevia','=',1)->delete();  // Elimina los detalles si está seleccionado Sumar al 
+            }
+             
             
-            if($mes_del_periodo==$cant_meses) { $mes_del_periodo=1; $periodo++; } else { $mes_del_periodo++; }
-            $mes++;
-            
-            $detalle->save();
+            if($this->cmbIvaAdmin == 'd') {
+                $detalle = new alqui_detalle();
+                $r = 'a'.$periodo;
+                if($b->valor_administrativos<>0) { $detalle->monto = $b->valor_administrativos; } else { $detalle->monto = $valores->$r*$b->porcentaje_administrativos/100; }   // Diferencia }
+                $this->CargarDetalle($detalle,'Honorarios Profesionales',true,true,$i,'Prop.',$fecha_inicio);
+                if($this->NoEstaRepetido('Honorarios Profesionales',$detalle->anio,$detalle->quien,$detalle->mes,$this->contrato_id)) $detalle->save();
+                alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('detalle','=','Alquiler')->where('vistaprevia','=',1)->delete();  // Elimina los detalles si está seleccionado Sumar al 
+            }
+
+            if($this->cmbIvaAdmin == 's') {
+                $detalle = new alqui_detalle();
+                $r = 'a'.$periodo;
+                if($b->valor_administrativos<>0) { $detalle->monto = $b->valor_administrativos; } else { $detalle->monto = $valores->$r*$b->porcentaje_administrativos/100*1.21; }   // Diferencia }
+                $this->CargarDetalle($detalle,'Honorarios Profesionales con iva',true,true,$i,'Prop.',$fecha_inicio);
+                if($this->NoEstaRepetido('Honorarios Profesionales con iva',$detalle->anio,$detalle->quien,$detalle->mes,$this->contrato_id)) $detalle->save();
+                alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('detalle','=','Alquiler')->where('vistaprevia','=',1)->delete();  // Elimina los detalles si está seleccionado Sumar al 
+            }
+
+                $fecha_inicio = date("Y-m-d", strtotime($fecha_inicio . "+ 1 month"));    
+                if($mes_del_periodo==$cant_meses) { $mes_del_periodo=1; $periodo++; } else { $mes_del_periodo++; }
+                $mes++;      
+            }
+        }
+        $this->detalles = alqui_detalle::where('contrato_id','=',$this->contrato_id)->orderby('fecha_vencimiento')->get();
+    }
+
+    public function CargarDetalle($detalle, $strDetalle,$mostrar,$vistaprevia,$cuota,$quien,$fecha_inicio) {
+        $detalle->detalle =$strDetalle;
+        $detalle->mostrar_en_conceptos = $mostrar;
+        $detalle->vistaprevia = $vistaprevia;
+        $detalle->mes = date("m",strtotime($fecha_inicio));
+        $detalle->anio = date("Y",strtotime($fecha_inicio));
+        $detalle->cuota = $cuota;
+        $detalle->quien = $quien;
+        $detalle->contrato_id = session('contrato_id');
+        $fecha_vencimiento =  date("Y-m-d", strtotime($fecha_inicio . "+ 10 days"));
+        $detalle->fecha_vencimiento = date("Y-m-d", strtotime($fecha_vencimiento . "+ 1 month")); 
+    }
+
+    public function NoEstaRepetido($detalle, $anio, $quien, $mes, $contrato_id) {
+        $aa = alqui_detalle::where('detalle','=',$detalle)
+        ->where('quien','=',$quien)
+        ->where('anio','=',  $anio)
+        ->where('mes','=',$mes)
+        ->where('contrato_id','=',$contrato_id)
+        ->get();
+        if(count($aa)==0) return true; // si no está grabado, lo graba, sino lo deja pasar
+    }
+
+    public function FijarDetalles() {
+        if(session('contrato_id')) {
+            if($this->cmbIvaAlquiler == '0') { alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('detalle','=','Alquiler con iva')->where('vistaprevia','=',1)->delete(); } // Elimina los detalles si está seleccionado Sumar al alquiler
+            if($this->cmbIvaAlquiler == 's') { alqui_detalle::where('contrato_id','=',$this->contrato_id)->where('detalle','=','Alquiler')->where('vistaprevia','=',1)->delete(); } // Elimina los detalles si está seleccionado Sumar al alquiler
+
+            $aa = alqui_detalle::where('contrato_id','=',$this->contrato_id)->update(['vistaprevia'=>0]);
+            $this->detalles = alqui_detalle::where('contrato_id','=',$this->contrato_id)->orderby('fecha_vencimiento')->get();
+            session()->flash('mensaje', 'Se Fijaron los detalles.');
         }
     }
 
-
+    public function BorrarVistaPrevia() { $this->detalles = []; }
+    
     public function CargarListado($quien) {
         $this->buscar =$quien;
         switch ($quien) {

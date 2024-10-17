@@ -16,10 +16,13 @@ return new class extends Migration
             $table->date('fecha_vencimiento');
             $table->string('detalle');
             $table->double('monto');
+            $table->string('quien');
             $table->boolean('mostrar_en_conceptos');
             $table->integer('mes');
             $table->integer('anio');
             $table->integer('cuota');
+            $table->string('signo')->dafault('+');
+            $table->boolean('vistaprevia');
             $table->unsignedBigInteger('contrato_id');
 
             $table->timestamps();

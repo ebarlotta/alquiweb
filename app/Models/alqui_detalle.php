@@ -19,5 +19,6 @@ class alqui_detalle extends Model
         'anio',
         'cuota',
         'contrato_id',
+        'vistaprevia',
     ];
 }

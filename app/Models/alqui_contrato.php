@@ -46,6 +46,7 @@ class alqui_contrato extends Model
         'bien_id',
         'valores',
         'activo',
+        'user_id',
     ];
 
     public function inquilino() {

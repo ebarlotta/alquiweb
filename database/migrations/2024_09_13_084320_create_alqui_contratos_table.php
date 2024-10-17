@@ -25,7 +25,6 @@ return new class extends Migration
             $table->unsignedBigInteger('bien_id');
             $table->unsignedBigInteger('inquilino_id');
             $table->unsignedBigInteger('propietario_id');
-            $table->boolean('activo');
 
             $table->string('administra_alquiler_id'); // 1. Administra / 2. No Administra / 3. Otro
             $table->string('lugar_pago_inquilino');  // 1.Efectivo en local | 2.Transferencia a Inmobiliaria | 3. Transferencia a propietario | 4. Nos especifica
@@ -54,6 +53,7 @@ return new class extends Migration
             $table->boolean('liquidacion_fraccionada')->default(0);
             $table->string('valores')->default(0);
             $table->string('activo')->default(true);
+            $table->unsignedBigInteger('user_id');
 
             $table->timestamps();
 
@@ -64,6 +64,7 @@ return new class extends Migration
             $table->foreign('ajuste_id')->references('id')->on('alqui_ajustes');
             // $table->foreign('intereses_punitorios_id')->references('id')->on('intereses_punitorios');
             $table->foreign('seguro_id')->references('id')->on('seguros');
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

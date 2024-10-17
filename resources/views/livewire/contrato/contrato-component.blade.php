@@ -227,10 +227,10 @@
                             <tr class="w-1/4">
                                 <td>Propietario</td>
                                 <td>
-                                    <input type="text" class="form-control" wire:model="propietario_text">
+                                    <input type="text" class="form-control" wire:model="propietario_text" @if(session('contrato_id')) disabled @endif>
                                     @error('propietario_id') <span class="text-red-500">{{ $message }}</span>@enderror
                                 </td>
-                                <td><input type="button" value="Buscar" class="form-control btn-primary" wire:click="CargarListado('Propietarios')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
+                                <td><input type="button" value="Buscar" class="form-control btn-primary" @if(session('contrato_id')) disabled @endif wire:click="CargarListado('Propietarios')" data-toggle="modal" data-target="#ModalBuscarPIG"></td>
                             </tr>
                             <tr>
                                 <td>Inquilino</td>
@@ -783,6 +783,13 @@
                     </div>
                     {{-- <div class="modal-body" id="modal_body"> --}}
                     <div>
+                        @if(Session::has('mensaje'))
+                            <div class="alert alert-success alert-dismissible" role="alert">
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <div class="header"><i class="notched circle loading icon"></i> <b> Éxito </b></div> 
+                                {{ Session::get('mensaje')}}
+                            </div>  
+                        @endif
                         <div class="d-flex"> <!--contiene ambos paneles-->
                             <div id="agrConc_panelIzq" style="width: 50%">
                                 <div class="card m-3 shadow-lg">
@@ -804,7 +811,7 @@
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">IVA Alquiler:</label>
                                                 </div>
-                                                <select class="form-control">
+                                                <select class="form-control" wire:model="cmbIvaAlquiler" wire:change.prevent="BorrarVistaPrevia()">
                                                     <option value="0" selected="">No</option>
                                                     <option value="d">Agregar discriminado</option>
                                                     <option value="s">Sumar al alquiler</option>
@@ -814,7 +821,7 @@
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">IVA Admin.:</label>
                                                 </div>
-                                                <select class="form-control">
+                                                <select class="form-control" wire:model="cmbIvaAdmin" wire:change="BorrarVistaPrevia()">
                                                     <option value="0" selected="">No</option>
                                                     <option value="d">Agregar discriminado</option>
                                                     <option value="s">Sumar a la admin.</option>
@@ -837,7 +844,7 @@
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Detalle</label>
                                                 </div>
-                                                <input type="text" class="form-control">
+                                                <input type="text" class="form-control" wire:model="OCDetalle">
                                             </div>
                                             @error('moneda_id') <span class="text-red-500">{{ $message }}</span>@enderror
                                 
@@ -845,7 +852,7 @@
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Monto</label>
                                                 </div>
-                                                <input type="number" class="bd form-control">
+                                                <input type="number" class="bd form-control" wire:model="OCMonto">
                                             </div>
                                             @error('moneda_id') <span class="text-red-500">{{ $message }}</span>@enderror
                                             
@@ -853,48 +860,49 @@
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Contrato</label>
                                                 </div>
-                                                <select class="form-control">
+                                                <select class="form-control" wire:model="OCContrato">
                                                     <option value="0" selected="">Sólo a este contrato</option>
                                                     <option value="1">Concepto grupal</option>
-                                                </select>                                                
+                                                </select>                                               
                                             </div>
                                                 
-                                                {{-- <div class="dpgTooltip tooltipMuchoTexto">
-                                                    <div class="dpgTooltip_div">
-                                                        <p class="dpgTooltip_p "></p>
-                                                        <u><b>Sólo a este contrato:</b></u><br>
-                                                        El concepto se agrega sólo a este contrato.<br><br>
-                                                        <u><b>Concepto grupal:</b></u><br>
-                                                        Se agregará un concepto en cada uno de los contratos que pertenecen al grupo. En un segundo paso se podrán elegir más opciones. Nota: Si no se ha definido un grupo para este contrato (ver novedades #108 a #110) o no hay otros contratos en el grupo, esta opción estará deshabilitada.
-                                                    </div>
-                                                </div>				 --}}
+                                            {{-- <div class="dpgTooltip tooltipMuchoTexto">
+                                                <div class="dpgTooltip_div">
+                                                    <p class="dpgTooltip_p "></p>
+                                                    <u><b>Sólo a este contrato:</b></u><br>
+                                                    El concepto se agrega sólo a este contrato.<br><br>
+                                                    <u><b>Concepto grupal:</b></u><br>
+                                                    Se agregará un concepto en cada uno de los contratos que pertenecen al grupo. En un segundo paso se podrán elegir más opciones. Nota: Si no se ha definido un grupo para este contrato (ver novedades #108 a #110) o no hay otros contratos en el grupo, esta opción estará deshabilitada.
+                                                </div>
+                                            </div>				 --}}
 
-                                            <div class="input-group mb-3 col-12">
+                                            {{-- <div class="input-group mb-3 col-12">
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Tratamiento</label>
                                                 </div>	
-                                                <select class="form-control">
+                                                <select class="form-control" wire:model="OCRepetir">
                                                     <option value="R" selected="">Repetir este monto</option>
                                                     <option value="I">Dividir en partes iguales</option>
                                                     <option value="P">Prorratear según porcentajes</option>
                                                 </select>
-                                            </div>	
+                                            </div>	 --}}
 
-                                            <div class="input-group mb-3 col-12">
+                                            {{-- <div class="input-group mb-3 col-12">
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Cálculo</label>
                                                 </div>
-                                                <select class="form-control">
+                                                <select class="form-control" wire:model="OCCalculo">
                                                     <option value="1" selected="">Mostrar en los conceptos</option>
                                                     <option value="0">No incluir en los conceptos</option>
                                                 </select>
-                                            </div>						
+                                            </div>						 --}}
                                     
                                             <div class="input-group mb-3 col-12">
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Agregar a</label>
                                                 </div>
-                                                <select class="form-control">
+                                                <select class="form-control" wire:model="OCAgregar">
+                                                    <option value="" selected>-- Seleccione un mes --</option>
                                                     <option value="I">Recibo inquilino</option>
                                                     <option value="P">Liquidación propietario</option>
                                                     <option value="C">Ambos (cancelación)</option>
@@ -921,10 +929,10 @@
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Meses</label>
                                                 </div>
-                                                <select class="form-control">
-                                                    <option value="1">Sólo el mes elegido (...)</option>
+                                                <select class="form-control" wire:model="OCMes_Todos" wire:change="CambiarMeses();">
                                                     <option value="T">Todos los meses</option>
-                                                    <option value="I">Intervalo de cuotas (...)</option>
+                                                    <option value="1">Sólo el mes elegido (...)</option>
+                                                    {{-- <option value="I">Intervalo de cuotas (...)</option>
                                                         <optgroup label="por año">
                                                             <option value="a1">Primer año</option>
                                                             <option value="a2">Segundo año</option>
@@ -937,9 +945,22 @@
                                                             <option value="s4">Semestre 4</option>
                                                             <option value="s5">Semestre 5</option>
                                                             <option value="s6">Semestre 6</option>
-                                                        </optgroup>						
+                                                        </optgroup>						 --}}
                                                 </select>
                                             </div>
+                                            @if($OCMes_Todos=='1')
+                                                <div class="input-group mb-3 col-12">
+                                                    <div class="input-group-prepend">
+                                                        <label type="button" class="btn btn-info">Mes</label>
+                                                    </div>
+                                                    <select class="form-control" wire:model="OCMesSolo">
+                                                        <option value="">-- Seleccione un mes --</option>
+                                                        @foreach($this->OCMes as $mes)
+                                                            <option value="{{ $mes }}">{{ $mes }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            @endif
                                             <div class="input-group mb-3 col-12">
                                                 <div class="input-group-prepend">
                                                     <input type="checkbox" class="btn btn-info mr-3">Omitir meses anteriores</label>
@@ -982,18 +1003,32 @@
                                                                         </div>
                                                                     </div>	 --}}
                                                                 </th>
-                                                                <th>Mes</th>
+                                                                <th>Período</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             @foreach ($detalles as $detalle)
                                                             <tr>
-                                                                <td>{{ date("d-m-Y",strtotime($detalle->fecha_vencimiento)) }} </td>
+                                                                {{-- <td>{{ date("d-m-Y",strtotime($detalle->fecha_vencimiento)) }} </td> --}}
+                                                                <td>
+                                                                    @if($detalle->vistaprevia==1) <img src="images/magic-wand-icon.jpg" alt="" style="width: 20px;height: 20px;margin:auto;">
+                                                                    @else 
+                                                                        <input type="radio" name="quizoption" id="quizoption0" value="0">
+                                                                    @endif
+                                                                    {{-- <strong style="color:green;">@</strong> @endif --}}                                                                
+                                                                </td>
+                                                                
                                                                 <td>{{ $detalle->detalle }} </td>
                                                                 <td>{{ $detalle->monto }} </td>
                                                                 <td>{{ $detalle->quien }} </td>
-                                                                <td>{{ $detalle->mes }} </td>
-                                                                <td>{{ $detalle->anio }} </td>
+                                                                <td style="color:green; bold">
+                                                                    <strong>
+                                                                        <svg class="svg-inline--fa fa-plus fa-w-12 ingr" aria-hidden="true" data-prefix="fal" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg="">
+                                                                            <path fill="currentColor" d="M376 232H216V72c0-4.42-3.58-8-8-8h-32c-4.42 0-8 3.58-8 8v160H8c-4.42 0-8 3.58-8 8v32c0 4.42 3.58 8 8 8h160v160c0 4.42 3.58 8 8 8h32c4.42 0 8-3.58 8-8V280h160c4.42 0 8-3.58 8-8v-32c0-4.42-3.58-8-8-8z"></path>
+                                                                        </svg>
+                                                                    </strong>
+                                                                </td>
+                                                                <td>{{ $detalle->mes }}/{{ $detalle->anio }}</td>
                                                             </tr>
                                                             @endforeach
                                                             <tr>
@@ -1017,14 +1052,16 @@
                         </div>                                
                     
                         <div class="centro ancho mb-3">
-                            <button type="button" class="btn btn-primary" wire:click="GuardaConceptos()">
-                                Guarda Conceptos
+                            OCContrato
+                            <button type="button" class="btn btn-primary" wire:click="GuardarOtrosConceptos()">
+                                &nbsp;&nbsp;&nbsp;Vista previa Otros Conceptos&nbsp;&nbsp;&nbsp;
                             </button>
-                            <button type="button" class="btn btn-primary">
+
+                            <button type="button" class="btn btn-primary" wire:click="GuardarConceptos()">
                                 &nbsp;&nbsp;&nbsp;Vista previa&nbsp;&nbsp;&nbsp;
                             </button>
                             &nbsp;
-                            <button type="button" class="btn btn-info">
+                            <button type="button" class="btn btn-info" wire:click="FijarDetalles()">
                                 &nbsp;Agregar / modificar
                             </button>
                         </div>
