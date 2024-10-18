@@ -793,13 +793,18 @@
                         <div class="d-flex"> <!--contiene ambos paneles-->
                             <div id="agrConc_panelIzq" style="width: 50%">
                                 <div class="card m-3 shadow-lg">
-                                    <ul class="nav nav-tabs responsive">
+                                    <div class="d-flex">
+                                        <button type="button" class="btn btn-info col-6 mr-1" wire:click="MostrarConceptosBasicos(1)">Conceptos básicos</button>
+                                        <button type="button" class="btn btn-info col-6" wire:click="MostrarConceptosBasicos(0)">Otros conceptos</button>
+                                    </div>
+                                    {{-- <ul class="nav nav-tabs responsive">
                                         <li class="active encabezado_card bg-blue col-6"><a data-toggle="tab" aria-current="page" href="#c1" aria-expanded="true">Conceptos básicos</a></li>
                                         <li class="encabezado_card bg-cyan col-6"><a data-toggle="tab" href="#c3" aria-expanded="false">Otros conceptos</a></li>
-                                    </ul>
+                                    </ul> --}}
 
                                     <div class="tab-content">
-                                        <div id="c1" class="text-left tab-pane fade active in p-2 show active">
+                                        @if($divMostrarConceptosBasicos)
+                                            <div class="text-left tab-pane fade active in p-2 show active">
                                             <p></p>
                                             <p>Los conceptos básicos son:</p>
                                             <p> · Alquiler para el inquilino</p>
@@ -837,9 +842,9 @@
                                                     </div>						
                                                 </div>
                                             </div>	
-                                        </div>
-
-                                        <div id="c3" class="tab-pane fade">
+                                            </div>
+                                        @else                                        
+                                            <div class="tab-pane fade active in p-2 show active">
                                             <div class="input-group mb-3 col-12">
                                                 <div class="input-group-prepend">
                                                     <label type="button" class="btn btn-info">Detalle</label>
@@ -978,7 +983,8 @@
                                                 </div>
                                             </div>
 
-                                        </div>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>                            
@@ -1011,23 +1017,21 @@
                                                             <tr>
                                                                 {{-- <td>{{ date("d-m-Y",strtotime($detalle->fecha_vencimiento)) }} </td> --}}
                                                                 <td>
-                                                                    @if($detalle->vistaprevia==1) <img src="images/magic-wand-icon.jpg" alt="" style="width: 20px;height: 20px;margin:auto;">
+                                                                    @if($detalle->vistaprevia==1) 
+                                                                        <img src="images/magic-wand-icon.jpg" alt="" style="width: 20px;height: 20px;margin:auto;">
                                                                     @else 
-                                                                        <input type="radio" name="quizoption" id="quizoption0" value="0">
+                                                                        <span style="height: 15px; width: 15px; background-color: green; border-radius: 50%; display: inline-block;"></span>
                                                                     @endif
-                                                                    {{-- <strong style="color:green;">@</strong> @endif --}}                                                                
                                                                 </td>
                                                                 
                                                                 <td>{{ $detalle->detalle }} </td>
-                                                                <td>{{ $detalle->monto }} </td>
+                                                                <td class="text-right">{{ number_format($detalle->monto,2,".",",") }} </td>
                                                                 <td>{{ $detalle->quien }} </td>
-                                                                <td style="color:green; bold">
-                                                                    <strong>
-                                                                        <svg class="svg-inline--fa fa-plus fa-w-12 ingr" aria-hidden="true" data-prefix="fal" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" data-fa-i2svg="">
-                                                                            <path fill="currentColor" d="M376 232H216V72c0-4.42-3.58-8-8-8h-32c-4.42 0-8 3.58-8 8v160H8c-4.42 0-8 3.58-8 8v32c0 4.42 3.58 8 8 8h160v160c0 4.42 3.58 8 8 8h32c4.42 0 8-3.58 8-8V280h160c4.42 0 8-3.58 8-8v-32c0-4.42-3.58-8-8-8z"></path>
-                                                                        </svg>
-                                                                    </strong>
+                                                                <td>
+                                                                    @if($detalle->signo=='+') <img src="/images/mas.jpg" alt="" style="width: 15px; height: 15px;">
+                                                                    @else <img src="/images/menos.jpg" alt="" style="width: 15px; height: 15px;">@endif
                                                                 </td>
+                                                                {{-- <td>{{ $detalle->signo }} &#10133;	+</td> --}}
                                                                 <td>{{ $detalle->mes }}/{{ $detalle->anio }}</td>
                                                             </tr>
                                                             @endforeach
@@ -1052,14 +1056,15 @@
                         </div>                                
                     
                         <div class="centro ancho mb-3">
-                            OCContrato
-                            <button type="button" class="btn btn-primary" wire:click="GuardarOtrosConceptos()">
-                                &nbsp;&nbsp;&nbsp;Vista previa Otros Conceptos&nbsp;&nbsp;&nbsp;
-                            </button>
-
-                            <button type="button" class="btn btn-primary" wire:click="GuardarConceptos()">
-                                &nbsp;&nbsp;&nbsp;Vista previa&nbsp;&nbsp;&nbsp;
-                            </button>
+                            @if($divMostrarConceptosBasicos)
+                                <button type="button" class="btn btn-primary" wire:click="GuardarConceptos()">
+                                    &nbsp;&nbsp;&nbsp;Vista previa&nbsp;&nbsp;&nbsp;
+                                </button>
+                            @else
+                                <button type="button" class="btn btn-primary" wire:click="GuardarOtrosConceptos()">
+                                    &nbsp;&nbsp;&nbsp;Vista previa Otros Conceptos&nbsp;&nbsp;&nbsp;
+                                </button>
+                            @endif
                             &nbsp;
                             <button type="button" class="btn btn-info" wire:click="FijarDetalles()">
                                 &nbsp;Agregar / modificar

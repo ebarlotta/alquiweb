@@ -23,6 +23,7 @@ return new class extends Migration
             $table->integer('cuota');
             $table->string('signo')->dafault('+');
             $table->boolean('vistaprevia');
+            $table->string('estadopago')->default('Impago');
             $table->unsignedBigInteger('contrato_id');
 
             $table->timestamps();
